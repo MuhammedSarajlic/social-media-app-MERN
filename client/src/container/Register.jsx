@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { useState } from "react";
 
 const Register = () => {
@@ -9,20 +10,9 @@ const Register = () => {
     password: "",
     imageUrl: "",
   });
+  const [error, setError] = useState("");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    await fetch("http://localhost:5000/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        password: user.password,
-        imageUrl: user.imageUrl,
-      }),
-    });
+  const clearUser = () => {
     setUser({
       firstName: "",
       lastName: "",
@@ -30,6 +20,36 @@ const Register = () => {
       password: "",
       imageUrl: "",
     });
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    const { firstName, lastName, email, password, imageUrl } = user;
+    axios
+      .post("http://localhost:5000/register", {
+        firstName,
+        lastName,
+        email,
+        password,
+        imageUrl,
+      })
+      .then(() => {
+        setUser({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          imageUrl: "",
+        });
+        setError("");
+      })
+      .catch((error) => {
+        if (error.response.status === 400) {
+          setError(error.response.data.error);
+        } else {
+          setError("An unknown error occurred");
+        }
+      });
   };
 
   const handleChange = (e) => {
@@ -80,6 +100,7 @@ const Register = () => {
           placeholder="Password"
           required
         />
+        {error && <p>{error}</p>}
         <button>Register</button>
       </form>
     </>

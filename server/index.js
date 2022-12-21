@@ -2,6 +2,7 @@ import express from "express";
 import { connect } from "mongoose";
 import cors from "cors";
 import { config } from "dotenv";
+import bcrypt from "bcrypt";
 config();
 const app = express();
 
@@ -17,16 +18,29 @@ app.get("/", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  console.log(req.body);
-  const newUser = new User({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    password: req.body.password,
-    imageUrl: req.body.imageUrl,
-  });
-  const createdUser = await newUser.save();
-  res.json(createdUser);
+  try {
+    const { firstName, lastName, email, password, imageUrl } = req.body;
+    if (await User.findOne({ email })) {
+      return res
+        .status(400)
+        .send({ error: "User with this email already exist" });
+    }
+    if (password.length < 8) {
+      return res.status(400).send({ error: "Password is too short" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      imageUrl,
+    });
+    await newUser.save();
+    res.send("User created");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 connect(process.env.MONGODB_URL).then(() => {
