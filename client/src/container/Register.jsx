@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [user, setUser] = useState({
@@ -11,16 +12,7 @@ const Register = () => {
     imageUrl: "",
   });
   const [error, setError] = useState("");
-
-  const clearUser = () => {
-    setUser({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      imageUrl: "",
-    });
-  };
+  const navigate = useNavigate();
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -42,6 +34,7 @@ const Register = () => {
           imageUrl: "",
         });
         setError("");
+        navigate("/login");
       })
       .catch((error) => {
         if (error.response.status === 400) {
