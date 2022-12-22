@@ -2,12 +2,21 @@ import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = Cookies.get("jwt_token");
+    if (token) {
+      navigate("/");
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,7 +25,9 @@ const Login = () => {
         email,
         password,
       })
-      .then(() => {
+      .then((response) => {
+        const token = response.data.token;
+        Cookies.set("jwt_token", token);
         setEmail("");
         setPassword("");
         navigate("/");

@@ -1,7 +1,8 @@
 import React from "react";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Register = () => {
   const [user, setUser] = useState({
@@ -13,6 +14,13 @@ const Register = () => {
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = Cookies.get("jwt_token");
+    if (token) {
+      navigate("/");
+    }
+  }, []);
 
   const handleRegister = (e) => {
     e.preventDefault();

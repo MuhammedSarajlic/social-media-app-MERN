@@ -1,9 +1,11 @@
 import express from "express";
-import { connect } from "mongoose";
+import mongoose, { connect } from "mongoose";
 import cors from "cors";
 import { config } from "dotenv";
 import bcrypt from "bcrypt";
 import session from "express-session";
+import MongoStore from "connect-mongo";
+import jwt from "jsonwebtoken";
 config();
 const app = express();
 
@@ -15,17 +17,19 @@ app.use(express.json());
 app.use(cors());
 app.use(
   session({
-    secret: "my-secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URL,
+      ttl: 86400,
+    }),
   })
 );
 
 app.get("/", (req, res) => {
   res.send("Hello");
 });
-
-app.get("/register", (req, res) => {});
 
 app.post("/register", async (req, res) => {
   try {
@@ -55,8 +59,8 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res
@@ -67,8 +71,8 @@ app.post("/login", async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).send({ error: "Invalid email or password" });
     }
-    req.session.user = user; // store authenticated user in session
-    res.send({ message: "Logged in successfully" });
+    const token = jwt.sign({ user }, "secret_key");
+    res.send({ token });
   } catch (error) {
     res.status(500).send(error.message);
   }

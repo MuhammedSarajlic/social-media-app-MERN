@@ -1,10 +1,22 @@
-import axios from "axios";
+import Cookies from "js-cookie";
 import React from "react";
+import { useNavigate } from "react-router";
 
 const Home = () => {
-  axios.get("http://localhost:5000/register").then((res) => console.log(res));
+  const navigate = useNavigate();
 
-  return <div>Home</div>;
+  const handleLogOut = () => {
+    Cookies.remove("jwt_token");
+    navigate("/login");
+    console.log("User logged out");
+  };
+
+  return (
+    <>
+      Home
+      <button onClick={handleLogOut}>Log out</button>
+    </>
+  );
 };
 
 export default Home;
