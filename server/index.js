@@ -15,17 +15,17 @@ const PORT = 5000;
 
 app.use(express.json());
 app.use(cors());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL,
-      ttl: 86400,
-    }),
-  })
-);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore.create({
+//       mongoUrl: process.env.MONGODB_URL,
+//       ttl: 86400,
+//     }),
+//   })
+// );
 
 app.get("/", (req, res) => {
   res.send("Hello");
@@ -71,7 +71,9 @@ app.post("/login", async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).send({ error: "Invalid email or password" });
     }
-    const token = jwt.sign({ user }, "secret_key");
+    const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
     res.send({ token });
   } catch (error) {
     res.status(500).send(error.message);

@@ -1,11 +1,11 @@
 import axios from "axios";
 import React from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,6 +28,7 @@ const Login = () => {
       .then((response) => {
         const token = response.data.token;
         Cookies.set("jwt_token", token);
+        setIsAuthenticated(true);
         setEmail("");
         setPassword("");
         navigate("/");
@@ -62,6 +63,9 @@ const Login = () => {
         />
         {error && <p>{error}</p>}
         <button>Login</button>
+        <p>
+          Don't have an account <Link to="/register">Register</Link>
+        </p>
       </form>
     </>
   );
