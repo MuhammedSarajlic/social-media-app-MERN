@@ -2,11 +2,12 @@ import Cookies from "js-cookie";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const Home = () => {
+const Home = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
 
   const handleLogOut = () => {
     Cookies.remove("jwt_token");
+    setIsAuthenticated(false);
     navigate("/login");
     console.log("User logged out");
   };
