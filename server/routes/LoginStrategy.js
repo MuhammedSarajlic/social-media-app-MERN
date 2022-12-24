@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 export default async function loginStrategy(req, res) {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -16,8 +16,9 @@ export default async function loginStrategy(req, res) {
       return res.status(401).send({ error: "Invalid email or password" });
     }
     const token = jwt.sign({ user }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+      expiresIn: rememberMe ? "7d" : "24h",
     });
+    console.log(rememberMe);
     res.send({ token });
   } catch (error) {
     res.status(500).send(error.message);

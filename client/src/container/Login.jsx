@@ -9,6 +9,7 @@ const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,10 +25,13 @@ const Login = ({ setIsAuthenticated }) => {
       .post("http://localhost:5000/login", {
         email,
         password,
+        rememberMe,
       })
       .then((response) => {
         const token = response.data.token;
-        Cookies.set("jwt_token", token);
+        Cookies.set("jwt_token", token, {
+          expiresIn: rememberMe ? "7d" : "24h",
+        });
         setIsAuthenticated(true);
         setEmail("");
         setPassword("");
@@ -95,6 +99,7 @@ const Login = ({ setIsAuthenticated }) => {
             <div class="flex items-center justify-between">
               <div class="flex items-center">
                 <input
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
