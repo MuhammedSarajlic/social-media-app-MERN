@@ -8,6 +8,7 @@ const Register = () => {
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
+    username: "",
     email: "",
     password: "",
     imageUrl: "",
@@ -24,11 +25,12 @@ const Register = () => {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    const { firstName, lastName, email, password, imageUrl } = user;
+    const { firstName, lastName, username, email, password, imageUrl } = user;
     axios
       .post("http://localhost:5000/register", {
         firstName,
         lastName,
+        username,
         email,
         password,
         imageUrl,
@@ -37,6 +39,7 @@ const Register = () => {
         setUser({
           firstName: "",
           lastName: "",
+          username: "",
           email: "",
           password: "",
           imageUrl: "",
@@ -59,21 +62,25 @@ const Register = () => {
 
   return (
     <>
-      <div class="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-md space-y-8">
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
           <div>
-            <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Create account
             </h2>
           </div>
 
           {/* Form start here */}
 
-          <form class="mt-8 space-y-6" onSubmit={handleRegister} method="POST">
+          <form
+            className="mt-8 space-y-6"
+            onSubmit={handleRegister}
+            method="POST"
+          >
             <input type="hidden" name="remember" value="true" />
-            <div class="-space-y-px rounded-md shadow-sm">
+            <div className="-space-y-px rounded-md shadow-sm">
               <div className="flex">
-                <label for="firstName" class="sr-only">
+                <label htmlFor="firstName" className="sr-only">
                   First Name
                 </label>
                 <input
@@ -83,10 +90,10 @@ const Register = () => {
                   required
                   value={user.firstName}
                   onChange={handleChange}
-                  class="relative block w-full appearance-none rounded-none rounded-tl-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  className="relative block w-full appearance-none rounded-none rounded-tl-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="First Name"
                 />
-                <label for="lastName" class="sr-only">
+                <label htmlFor="lastName" className="sr-only">
                   Last Name
                 </label>
                 <input
@@ -96,39 +103,52 @@ const Register = () => {
                   required
                   value={user.lastName}
                   onChange={handleChange}
-                  class="relative block w-full appearance-none rounded-none rounded-tr-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  className="relative block w-full appearance-none rounded-none rounded-tr-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Last Name"
                 />
               </div>
               <div>
-                <label for="email-address" class="sr-only">
+                <label htmlFor="username" className="sr-only">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={user.username}
+                  onChange={handleChange}
+                  className="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Username"
+                />
+              </div>
+              <div>
+                <label htmlFor="email-address" className="sr-only">
                   Email address
                 </label>
                 <input
                   id="email-address"
                   name="email"
                   type="email"
-                  autocomplete="email"
                   required
                   value={user.email}
                   onChange={handleChange}
-                  class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  className="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Email address"
                 />
               </div>
               <div>
-                <label for="password" class="sr-only">
+                <label htmlFor="password" className="sr-only">
                   Password
                 </label>
                 <input
                   id="password"
                   name="password"
                   type="password"
-                  autocomplete="current-password"
                   required
                   value={user.password}
                   onChange={handleChange}
-                  class="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Password"
                 />
               </div>
@@ -138,7 +158,7 @@ const Register = () => {
             <div>
               <button
                 type="submit"
-                class="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 Register
               </button>

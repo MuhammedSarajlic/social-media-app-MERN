@@ -3,12 +3,17 @@ import bcrypt from "bcrypt";
 
 export default async function registerStrategy(req, res) {
   try {
-    const { firstName, lastName, email, password, imageUrl } = req.body;
-    const user = await User.findOne({ email });
-    if (user) {
+    const { firstName, lastName, username, email, password, imageUrl } =
+      req.body;
+    //const user = await User.findOne({ email });
+    if (await User.findOne({ email })) {
       return res
         .status(400)
         .send({ error: "User with this email already exist" });
+    } else if (await User.findOne({ email })) {
+      return res
+        .status(400)
+        .send({ error: "User with this username already exist" });
     }
     if (password.length < 8) {
       return res.status(400).send({ error: "Password is too short" });
@@ -17,6 +22,7 @@ export default async function registerStrategy(req, res) {
     const newUser = new User({
       firstName,
       lastName,
+      username,
       email,
       password: hashedPassword,
       imageUrl,

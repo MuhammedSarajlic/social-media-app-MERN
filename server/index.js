@@ -6,6 +6,7 @@ config();
 const app = express();
 
 import { loginStrategy, registerStrategy } from "./routes/index.js";
+import jwt from "jsonwebtoken";
 
 const PORT = 5000;
 
@@ -19,6 +20,13 @@ app.get("/", (req, res) => {
 app.post("/register", registerStrategy);
 
 app.post("/login", loginStrategy);
+
+app.post("/api/protected", (req, res) => {
+  const token = req.body.headers.Authorization;
+  const user = jwt.verify(token, process.env.JWT_SECRET);
+  res.send({ user });
+  console.log(user);
+});
 
 mongoose.set("strictQuery", false);
 connect(process.env.MONGODB_URL).then(() => {
