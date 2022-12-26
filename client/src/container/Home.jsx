@@ -1,98 +1,110 @@
-import Cookies from "js-cookie";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Fragment } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { BellIcon } from "@heroicons/react/24/outline";
+import { useRef } from "react";
+import { useState } from "react";
+import { AddPostModal, Navbar } from "../components";
 
-const Home = ({ setIsAuthenticated, user }) => {
-  const navigate = useNavigate();
+const Home = ({ user, handleLogOut }) => {
+  const fileInput = useRef(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogOut = () => {
-    Cookies.remove("jwt_token");
-    setIsAuthenticated(false);
-    navigate("/login");
+  const handleImageInput = (e) => {
+    e.preventDefault();
+    const file = fileInput.current.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageUrl(e.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  if (!user) return <div>Loading...</div>;
+  const addPost = () => {
+    console.log("Add post");
+    handleRemoveImage();
+    setIsOpen(false);
+  };
+
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleRemoveImage = () => {
+    setImageUrl("");
+  };
 
   return (
     <>
-      <p>{user?.user.firstName}</p>
-      {/*Here it starts */}
-      <Disclosure as="nav" className="bg-gray-800">
-        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between">
-            <div className="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
-              <div className="flex flex-shrink-0 items-center">
-                <img
-                  className="block h-8 w-auto lg:hidden"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                  alt="Your Company"
-                />
-                <img
-                  className="hidden h-8 w-auto lg:block"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                  alt="Your Company"
+      <Navbar user={user} handleLogOut={handleLogOut} />
+      <div className="flex space-x-10 mt-10 mx-auto max-w-6xl px-2 sm:px-6 lg:px-8">
+        <div className="w-2/3 bg-red-900">
+          {/* add post form */}
+          <div className="w-full rounded-lg bg-white">
+            <form>
+              <div className="h-5 w-full border-b-[1px] py-5 flex items-center">
+                <p className="font-bold px-4">Add post</p>
+              </div>
+              <div>
+                <textarea
+                  className="min-h-full w-full resize-none border-none outline-none"
+                  placeholder="Say something..."
                 />
               </div>
-            </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              <div className="flex justify-between px-2 py-3 border-y-[1px]">
+                <div
+                  className="flex items-center border-2 px-2 space-x-2 rounded-xl cursor-pointer"
+                  onClick={handleOpen}
+                >
+                  <ion-icon name="videocam-outline"></ion-icon>
+                  <p>Add Video</p>
+                </div>
+                <div
+                  className="flex items-center border-2 px-2 space-x-2 rounded-xl cursor-pointer"
+                  onClick={handleOpen}
+                >
+                  <ion-icon name="image-outline"></ion-icon>
+                  <p>Add photo</p>
+                </div>
+                <div
+                  className="flex items-center border-2 px-2 space-x-2 rounded-xl cursor-pointer"
+                  onClick={handleOpen}
+                >
+                  <ion-icon name="map-outline"></ion-icon>{" "}
+                  <p>Add map location</p>
+                </div>
+                {/* <input
+                    type="file"
+                    id="file"
+                    className="hidden"
+                    accept="image/*"
+                    ref={fileInput}
+                    onChange={handleImageInput}
+                  /> */}
+              </div>
               <button
+                onClick={addPost}
                 type="button"
-                className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="ml-2 mt-2 focus:outline-none text-white bg-indigo-600 hover:bg-indigo-600 font-medium rounded-xl text-sm px-4 py-2 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
               >
-                <span className="sr-only">View notifications</span>
-                <BellIcon className="h-6 w-6" aria-hidden="true" />
+                Add post
               </button>
 
-              {/* Profile dropdown */}
-              <Menu as="div" className="relative ml-3">
-                <div>
-                  <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                    <span className="sr-only">Open user menu</span>
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src={user.user.imageUrl}
-                      alt=""
-                    />
-                  </Menu.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <Menu.Item>
-                      <a className={"block px-4 py-2 text-sm text-gray-700"}>
-                        Your Profile
-                      </a>
-                    </Menu.Item>
-                    <Menu.Item>
-                      <a className={"block px-4 py-2 text-sm text-gray-700"}>
-                        Settings
-                      </a>
-                    </Menu.Item>
-                    <Menu.Item>
-                      <button
-                        onClick={handleLogOut}
-                        className={"block px-4 py-2 text-sm text-gray-700"}
-                      >
-                        Sign out
-                      </button>
-                    </Menu.Item>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-            </div>
+              {isOpen && (
+                <AddPostModal
+                  handleOpen={handleOpen}
+                  imageUrl={imageUrl}
+                  handleRemoveImage={handleRemoveImage}
+                  fileInput={fileInput}
+                  handleImageInput={handleImageInput}
+                  addPost={addPost}
+                />
+              )}
+            </form>
           </div>
+          {/* Posts */}
+          <div>Post</div>
         </div>
-      </Disclosure>
+        <div className="w-1/3 bg-lime-600">Suggest</div>
+      </div>
     </>
   );
 };

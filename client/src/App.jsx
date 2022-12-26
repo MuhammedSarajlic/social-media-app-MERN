@@ -1,12 +1,19 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
-import { Home, Register, Login } from "./container/index";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { Home, Register, Login, UserProfile } from "./container/index";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    Cookies.remove("jwt_token");
+    setIsAuthenticated(false);
+    navigate("/login");
+  };
 
   useEffect(() => {
     const token = Cookies.get("jwt_token");
@@ -25,7 +32,7 @@ function App() {
   }, [isAuthenticated]);
 
   return (
-    <>
+    <div className="bg-[#f0f2f5]">
       <Routes>
         <Route
           path="/"
@@ -34,7 +41,7 @@ function App() {
               <Home
                 setIsAuthenticated={setIsAuthenticated}
                 user={user}
-                setUser={setUser}
+                handleLogOut={handleLogOut}
               />
             ) : (
               <Login setIsAuthenticated={setIsAuthenticated} />
@@ -46,8 +53,12 @@ function App() {
           path="/login"
           element={<Login setIsAuthenticated={setIsAuthenticated} />}
         />
+        <Route
+          path="/profile"
+          element={<UserProfile user={user} handleLogOut={handleLogOut} />}
+        />
       </Routes>
-    </>
+    </div>
   );
 }
 
