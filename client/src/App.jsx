@@ -31,6 +31,8 @@ function App() {
     }
   }, [isAuthenticated]);
 
+  if (!user) return <div>Loading...</div>;
+
   return (
     <div className="bg-[#f0f2f5]">
       <Routes>

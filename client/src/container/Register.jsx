@@ -26,11 +26,12 @@ const Register = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     const { firstName, lastName, username, email, password, imageUrl } = user;
+    const lowerCaseUsername = username.toLowerCase();
     axios
       .post("http://localhost:5000/register", {
         firstName,
         lastName,
-        username,
+        username: lowerCaseUsername,
         email,
         password,
         imageUrl,
