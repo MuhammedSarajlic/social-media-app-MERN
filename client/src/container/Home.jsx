@@ -20,7 +20,7 @@ const Home = ({ user, handleLogOut }) => {
     axios.get("http://localhost:5000/posts").then((response) => {
       setPosts(response.data);
     });
-    console.log(posts);
+    console.log(user);
   }, []);
 
   const handleImageInput = (e) => {
@@ -40,12 +40,10 @@ const Home = ({ user, handleLogOut }) => {
     axios
       .post("http://localhost:5000/create-post", {
         description,
-        imageUrl,
         authorId,
+        imageUrl,
       })
       .then((res) => {
-        console.log(res.data);
-        setPosts([formData, ...posts]);
         setFormData({ description: "", imageUrl: "" });
       })
       .catch((error) => console.log(error));

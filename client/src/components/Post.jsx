@@ -15,15 +15,15 @@ const Post = ({ post }) => {
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 rounded-full overflow-hidden">
-              <img src={post.authorId.imageUrl} alt="" />
+              <img src={post?.authorId.imageUrl} alt="" />
             </div>
             <div>
-              <Link to={`/${post.authorId.username}`}>
+              <Link to={`/${post?.authorId.username}`}>
                 <p className="font-bold hover:cursor-pointer hover:underline">
-                  {`${post.authorId.firstName} ${post.authorId.lastName}`}
+                  {`${post?.authorId.firstName} ${post?.authorId.lastName}`}
                 </p>
               </Link>
-              <p className="text-gray-600 ">{`@${post.authorId.username}`}</p>
+              <p className="text-gray-600 ">{`@${post?.authorId.username}`}</p>
             </div>
           </div>
           <div className="cursor-pointer text-xl">
@@ -31,12 +31,12 @@ const Post = ({ post }) => {
           </div>
         </div>
         <div className="px-4 py-2">
-          <p>{post.description}</p>
+          <p>{post?.description}</p>
         </div>
       </div>
-      {post.imageUrl && (
+      {post?.imageUrl && (
         <div className="w-full h-full">
-          <img src={post.imageUrl} alt="" className="w-full h-full" />
+          <img src={post?.imageUrl} alt="" className="w-full h-full" />
         </div>
       )}
       <div className="max-w-full flex items-center justify-between px-4 py-2 border-t-[1px]">

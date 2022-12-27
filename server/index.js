@@ -3,6 +3,7 @@ import mongoose, { connect } from "mongoose";
 import cors from "cors";
 import { config } from "dotenv";
 config();
+import bodyParser from "body-parser";
 const app = express();
 
 import { loginStrategy, registerStrategy } from "./routes/index.js";
@@ -11,6 +12,8 @@ import Post from "./modules/PostModule.js";
 
 const PORT = 5000;
 
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 app.use(express.json());
 app.use(cors());
 
@@ -27,8 +30,8 @@ app.post("/create-post", async (req, res) => {
   try {
     const newPost = new Post({
       description,
-      imageUrl,
       authorId,
+      imageUrl,
     });
     await newPost.save();
     res.send("Post created");

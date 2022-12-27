@@ -73,7 +73,7 @@ const AddPostModal = ({
                         or drag and drop
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        SVG, PNG, JPG or GIF (MAX. 800x400px)
+                        SVG, PNG, JPG or GIF (MAX. 5MB)
                       </p>
                     </div>
                     <input
