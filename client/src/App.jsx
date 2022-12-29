@@ -30,7 +30,6 @@ function App() {
           setUser(response.data.user.user);
         });
     }
-    console.log(user);
   }, [isAuthenticated]);
 
   return (

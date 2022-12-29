@@ -38,11 +38,20 @@ const Navbar = ({ user, handleLogOut }) => {
                 <div>
                   <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     <span className="sr-only">Open user menu</span>
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={user?.imageUrl}
-                      alt=""
-                    />
+                    {user?.imageUrl ? (
+                      <img
+                        className="h-10 w-10 rounded-full"
+                        src={user?.imageUrl}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-500">
+                        <p className="text-white font-bold text-lg">
+                          {user?.firstName.charAt(0)}
+                          {user?.lastName.charAt(0)}
+                        </p>
+                      </div>
+                    )}
                   </Menu.Button>
                 </div>
                 <Transition

@@ -15,7 +15,16 @@ const Post = ({ post }) => {
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 rounded-full overflow-hidden">
-              <img src={post?.authorId.imageUrl} alt="" />
+              {post?.authorId.imageUrl ? (
+                <img src={post?.authorId.imageUrl} alt="" />
+              ) : (
+                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-500">
+                  <p className="text-white font-bold text-lg">
+                    {post?.authorId.firstName.charAt(0)}
+                    {post?.authorId.lastName.charAt(0)}
+                  </p>
+                </div>
+              )}
             </div>
             <div>
               <Link to={`/${post?.authorId.username}`}>
