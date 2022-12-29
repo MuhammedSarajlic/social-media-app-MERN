@@ -12,6 +12,7 @@ function App() {
   const handleLogOut = () => {
     Cookies.remove("jwt_token");
     setIsAuthenticated(false);
+    // setUser({});
     navigate("/login");
   };
 
@@ -26,41 +27,44 @@ function App() {
           },
         })
         .then((response) => {
-          setUser(response.data.user);
+          setUser(response.data.user.user);
         });
     }
+    console.log(user);
   }, [isAuthenticated]);
 
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="bg-[#f0f2f5]">
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Home
-                setIsAuthenticated={setIsAuthenticated}
-                user={user}
-                handleLogOut={handleLogOut}
-              />
-            ) : (
-              <Login setIsAuthenticated={setIsAuthenticated} />
-            )
-          }
-        />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/login"
-          element={<Login setIsAuthenticated={setIsAuthenticated} />}
-        />
-        <Route
-          path="/profile"
-          element={<UserProfile user={user} handleLogOut={handleLogOut} />}
-        />
-      </Routes>
-    </div>
+    <>
+      <div className="bg-[#f0f2f5]">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Home
+                  setIsAuthenticated={setIsAuthenticated}
+                  user={user}
+                  handleLogOut={handleLogOut}
+                />
+              ) : (
+                <Login setIsAuthenticated={setIsAuthenticated} />
+              )
+            }
+          />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={<Login setIsAuthenticated={setIsAuthenticated} />}
+          />
+          <Route
+            path="/profile"
+            element={<UserProfile user={user} handleLogOut={handleLogOut} />}
+          />
+        </Routes>
+      </div>
+    </>
   );
 }
 

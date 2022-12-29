@@ -40,7 +40,7 @@ const Navbar = ({ user, handleLogOut }) => {
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="h-10 w-10 rounded-full"
-                      src={user?.user.imageUrl}
+                      src={user?.imageUrl}
                       alt=""
                     />
                   </Menu.Button>

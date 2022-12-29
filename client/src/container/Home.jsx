@@ -2,25 +2,31 @@ import React from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
-import { AddPostForm, AddPostModal, Navbar, Post } from "../components";
+import {
+  AddPostForm,
+  AddPostModal,
+  LaodingPost,
+  Navbar,
+  Post,
+} from "../components";
 import axios from "axios";
 
 const Home = ({ user, handleLogOut }) => {
   const fileInput = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [formData, setFormData] = useState({
     description: "",
     imageUrl: "",
-    authorId: user?.user._id,
+    authorId: user?._id,
   });
 
   useEffect(() => {
     axios.get("http://localhost:5000/posts").then((response) => {
       setPosts(response.data);
     });
-    console.log(user);
   }, []);
 
   const handleImageInput = (e) => {
@@ -36,15 +42,18 @@ const Home = ({ user, handleLogOut }) => {
 
   const handleAddPost = (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const { description, imageUrl, authorId } = formData;
     axios
       .post("http://localhost:5000/create-post", {
         description,
-        authorId,
         imageUrl,
+        authorId,
       })
-      .then((res) => {
+      .then(() => {
+        setIsLoading(false);
         setFormData({ description: "", imageUrl: "" });
+        window.location.reload(false);
       })
       .catch((error) => console.log(error));
     handleRemoveImage();
@@ -58,17 +67,20 @@ const Home = ({ user, handleLogOut }) => {
 
   const handleRemoveImage = () => {
     setImageUrl("");
+    setFormData({ ...formData, imageUrl: "" });
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  if (!user) return <div>Loading...</div>;
+  // if (!user) return <div>Loading...</div>;
 
   return (
     <>
+      {console.log(isLoading)}
       <Navbar user={user} handleLogOut={handleLogOut} />
+      {/* {console.log("Here post", posts)} */}
       <div className="flex space-x-10 mt-5 mx-auto max-w-5xl sm:px-6 lg:px-8">
         <div className="w-2/3">
           <div className="w-full rounded-lg bg-white">
@@ -78,6 +90,7 @@ const Home = ({ user, handleLogOut }) => {
               handleChange={handleChange}
               handleOpen={handleOpen}
             />
+
             {isOpen && (
               <AddPostModal
                 handleOpen={handleOpen}
@@ -92,6 +105,8 @@ const Home = ({ user, handleLogOut }) => {
             )}
           </div>
           <div>
+            {isLoading && <LaodingPost />}
+
             {posts?.map((post, i) => (
               <Post key={i} post={post} />
             ))}

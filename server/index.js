@@ -9,6 +9,7 @@ const app = express();
 import { loginStrategy, registerStrategy } from "./routes/index.js";
 import jwt from "jsonwebtoken";
 import Post from "./modules/PostModule.js";
+import User from "./modules/UserModule.js";
 
 const PORT = 5000;
 
@@ -27,11 +28,12 @@ app.post("/login", loginStrategy);
 
 app.post("/create-post", async (req, res) => {
   const { description, imageUrl, authorId } = req.body;
+  const user = await User.findOne({ authorId });
   try {
     const newPost = new Post({
       description,
-      authorId,
       imageUrl,
+      authorId,
     });
     await newPost.save();
     res.send("Post created");

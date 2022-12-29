@@ -18,7 +18,7 @@ export default async function loginStrategy(req, res) {
     const token = jwt.sign({ user }, process.env.JWT_SECRET, {
       expiresIn: rememberMe ? "7d" : "24h",
     });
-    res.send({ token });
+    res.send({ token, user });
   } catch (error) {
     res.status(500).send(error.message);
   }
