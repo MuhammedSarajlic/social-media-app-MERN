@@ -5,5 +5,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms"), require("flowbite/plugin")],
+  plugins: [require("@tailwindcss/forms"), require("tailwind-scrollbar-hide")],
 };

@@ -62,7 +62,6 @@ app.post("/api/posts/:id/like", (req, res) => {
       return res.status(404).send({ error: "Post not found" });
     }
     const index = post.likes.indexOf(userId);
-    console.log(index);
     if (index !== -1) {
       return res.status(400).send({ error: "Post already liked" });
     }

@@ -9,7 +9,7 @@ const AddPostForm = ({ handleAddPost, formData, handleChange, handleOpen }) => {
         </div>
         <div>
           <textarea
-            className="min-h-full w-full resize-none border-none outline-none"
+            className="min-h-full w-full resize-none border-none outline-none focus:ring-0"
             placeholder="Say something..."
             name="description"
             value={formData.description}

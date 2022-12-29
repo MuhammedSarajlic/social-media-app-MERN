@@ -31,7 +31,7 @@ const AddPostModal = ({
             <form onSubmit={handleAddPost}>
               <div className="flex flex-col items-center justify-center w-full mt-4">
                 <textarea
-                  className="w-full border-none p-0 resize-none outline-none"
+                  className="w-full border-none p-0 resize-none outline-none focus:ring-0"
                   placeholder="Say something..."
                   name="description"
                   value={formData.description}

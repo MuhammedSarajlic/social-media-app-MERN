@@ -8,14 +8,19 @@ import {
   LaodingPost,
   Navbar,
   Post,
+  PostModal,
 } from "../components";
 import axios from "axios";
 
 const Home = ({ user, handleLogOut }) => {
   const fileInput = useRef(null);
+  const [tempPost, setTempPost] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState({
+    postModal: false,
+    addPostModal: false,
+  });
   const [posts, setPosts] = useState([]);
   const [formData, setFormData] = useState({
     description: "",
@@ -54,15 +59,18 @@ const Home = ({ user, handleLogOut }) => {
         setIsLoading(false);
         setFormData({ description: "", imageUrl: "" });
         window.location.reload(false);
-      })
-      .catch((error) => console.log(error));
+      });
     handleRemoveImage();
-    setIsOpen(false);
+    setIsOpen({ addPostModal: false });
   };
 
   const handleOpen = () => {
-    setIsOpen(!isOpen);
+    setIsOpen({ addPostModal: !isOpen.addPostModal });
     handleRemoveImage();
+  };
+
+  const handleOpenPost = () => {
+    setIsOpen({ postModal: !isOpen.postModal });
   };
 
   const handleRemoveImage = () => {
@@ -79,7 +87,7 @@ const Home = ({ user, handleLogOut }) => {
   return (
     <>
       <Navbar user={user} handleLogOut={handleLogOut} />
-      <div className="h-screen flex space-x-10 mt-5 mx-auto max-w-5xl sm:px-6 lg:px-8">
+      <div className="h-full flex space-x-10 mt-5 mx-auto max-w-5xl sm:px-6 lg:px-8">
         <div className="w-2/3">
           <div className="w-full rounded-lg bg-white">
             <AddPostForm
@@ -89,7 +97,7 @@ const Home = ({ user, handleLogOut }) => {
               handleOpen={handleOpen}
             />
 
-            {isOpen && (
+            {isOpen.addPostModal && (
               <AddPostModal
                 handleOpen={handleOpen}
                 imageUrl={imageUrl}
@@ -103,10 +111,25 @@ const Home = ({ user, handleLogOut }) => {
             )}
           </div>
           <div>
+            {/* {isOpen.postModal && (
+              <PostModal
+                handleOpenPost={handleOpenPost}
+                posts={posts}
+                tempPost={tempPost}
+              />
+            )} */}
+          </div>
+          <div>
             {isLoading && <LaodingPost />}
 
             {posts?.map((post, i) => (
-              <Post key={i} post={post} user={user} />
+              <Post
+                key={i}
+                post={post}
+                user={user}
+                handleOpenPost={handleOpenPost}
+                setTempPost={setTempPost}
+              />
             ))}
           </div>
         </div>
