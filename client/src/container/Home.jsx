@@ -20,7 +20,7 @@ const Home = ({ user, handleLogOut }) => {
   const [formData, setFormData] = useState({
     description: "",
     imageUrl: "",
-    authorId: user?._id,
+    authorId: "",
   });
 
   useEffect(() => {
@@ -43,12 +43,12 @@ const Home = ({ user, handleLogOut }) => {
   const handleAddPost = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const { description, imageUrl, authorId } = formData;
+    const { description, imageUrl } = formData;
     axios
       .post("http://localhost:5000/create-post", {
         description,
         imageUrl,
-        authorId,
+        authorId: user._id,
       })
       .then(() => {
         setIsLoading(false);
@@ -74,13 +74,11 @@ const Home = ({ user, handleLogOut }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // if (!user) return <div>Loading...</div>;
+  if (!user) return <div>Loading...</div>;
 
   return (
     <>
-      {console.log(isLoading)}
       <Navbar user={user} handleLogOut={handleLogOut} />
-      {/* {console.log("Here post", posts)} */}
       <div className="flex space-x-10 mt-5 mx-auto max-w-5xl sm:px-6 lg:px-8">
         <div className="w-2/3">
           <div className="w-full rounded-lg bg-white">

@@ -12,7 +12,7 @@ function App() {
   const handleLogOut = () => {
     Cookies.remove("jwt_token");
     setIsAuthenticated(false);
-    // setUser({});
+    setUser(null);
     navigate("/login");
   };
 
@@ -32,8 +32,6 @@ function App() {
     }
     console.log(user);
   }, [isAuthenticated]);
-
-  if (!user) return <div>Loading...</div>;
 
   return (
     <>
