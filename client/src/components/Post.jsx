@@ -3,9 +3,8 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
-const Post = ({ post }) => {
+const Post = ({ post, handleLike, setPostId }) => {
   const [isLiked, setIsLiked] = useState(false);
-
   const date = moment(post.createdAt).format("MMMM D, YYYY");
   const time = moment(post.createdAt).format("HH:mm");
 
@@ -52,11 +51,18 @@ const Post = ({ post }) => {
         <div className="flex items-center justify-center space-x-6">
           <div
             className="text-xl cursor-pointer"
-            onClick={() => setIsLiked(!isLiked)}
+            onClick={() => {
+              setIsLiked(!isLiked);
+              setPostId(post._id);
+              handleLike(post._id);
+            }}
           >
             {isLiked ? (
               <div className="flex items-center justify-center space-x-1">
-                <div className="flex items-center justify-center w-8 h-8 text-indigo-600">
+                <div
+                  className="flex items-center justify-center w-8 h-8 text-indigo-600"
+                  // onClick={handleLike}
+                >
                   <ion-icon name="heart"></ion-icon>
                 </div>
                 <p className="text-base text-indigo-800">231</p>

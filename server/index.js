@@ -51,6 +51,52 @@ app.get("/posts", async (req, res) => {
   }
 });
 
+app.post("/api/posts/:id/like", (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  Post.findById(id, (error, post) => {
+    if (error) {
+      return res.status(500).send({ error: "Error liking post" });
+    }
+    if (!post) {
+      return res.status(404).send({ error: "Post not found" });
+    }
+    post.likes.push(userId);
+    post.save((error) => {
+      if (error) {
+        return res.status(500).send({ error: "Error liking post" });
+      }
+      res.send({ message: "Post liked" });
+    });
+  });
+});
+
+app.delete("/api/posts/:id/like", (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  console.log("user", req.body);
+  Post.findById(id, (error, post) => {
+    if (error) {
+      return res.status(500).send({ error: "Error unliking post" });
+    }
+    if (!post) {
+      return res.status(404).send({ error: "Post not found" });
+    }
+    const index = post.likes.indexOf(userId);
+    console.log(post.likes.indexOf(userId));
+    if (index === -1) {
+      return res.status(400).send({ error: "Post not liked" });
+    }
+    post.likes.splice(index, 1);
+    post.save((error) => {
+      if (error) {
+        return res.status(500).send({ error: "Error unliking post" });
+      }
+      res.send({ message: "Post unliked" });
+    });
+  });
+});
+
 app.post("/api/protected", (req, res) => {
   const token = req.body.headers.Authorization;
   const user = jwt.verify(token, process.env.JWT_SECRET);

@@ -13,6 +13,8 @@ import axios from "axios";
 
 const Home = ({ user, handleLogOut }) => {
   const fileInput = useRef(null);
+  const [postId, setPostId] = useState("");
+  const [changeLike, setChangeLike] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -74,12 +76,34 @@ const Home = ({ user, handleLogOut }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleLike = (id) => {
+    // console.log(id);
+    const userId = user._id;
+    console.log(userId);
+    if (!changeLike) {
+      console.log("Liked");
+      axios
+        .post(`http://localhost:5000/api/posts/${id}/like`, { userId })
+        .then((res) => console.log(res.data.message));
+      setChangeLike(true);
+    } else {
+      console.log("Unliked");
+      axios
+        .delete(`http://localhost:5000/api/posts/${id}/like`, {
+          data: { userId },
+        })
+        .then((res) => console.log(res.data.message))
+        .catch((error) => console.log(error));
+      setChangeLike(false);
+    }
+  };
+
   if (!user) return <div>Loading...</div>;
 
   return (
     <>
       <Navbar user={user} handleLogOut={handleLogOut} />
-      <div className="flex space-x-10 mt-5 mx-auto max-w-5xl sm:px-6 lg:px-8">
+      <div className="h-screen flex space-x-10 mt-5 mx-auto max-w-5xl sm:px-6 lg:px-8">
         <div className="w-2/3">
           <div className="w-full rounded-lg bg-white">
             <AddPostForm
@@ -106,7 +130,14 @@ const Home = ({ user, handleLogOut }) => {
             {isLoading && <LaodingPost />}
 
             {posts?.map((post, i) => (
-              <Post key={i} post={post} />
+              <Post
+                key={i}
+                post={post}
+                handleLike={handleLike}
+                setPostId={setPostId}
+                // setIsLiked={setIsLiked}
+                // isLiked={isLiked}
+              />
             ))}
           </div>
         </div>
