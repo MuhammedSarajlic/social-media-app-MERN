@@ -56,7 +56,7 @@ function App() {
             element={<Login setIsAuthenticated={setIsAuthenticated} />}
           />
           <Route
-            path="/profile"
+            path="/:username"
             element={<UserProfile user={user} handleLogOut={handleLogOut} />}
           />
         </Routes>

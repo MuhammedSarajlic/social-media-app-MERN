@@ -1,10 +1,11 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import { Navbar } from "../components";
 
 const UserProfile = ({ user, handleLogOut }) => {
+  const { username } = useParams();
   return (
     <div>
-      User profile
       <Navbar user={user} handleLogOut={handleLogOut} />
     </div>
   );
