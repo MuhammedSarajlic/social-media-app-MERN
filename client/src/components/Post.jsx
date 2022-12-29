@@ -1,12 +1,51 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import axios from "axios";
 
-const Post = ({ post, handleLike, setPostId }) => {
+const Post = ({ post, user }) => {
+  const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const date = moment(post.createdAt).format("MMMM D, YYYY");
   const time = moment(post.createdAt).format("HH:mm");
+  const postId = post._id;
+  const userId = user._id;
+
+  useEffect(() => {
+    async function checkLiked() {
+      await axios
+        .get(`http://localhost:5000/api/posts/${postId}/like?userId=${userId}`)
+        .then((res) => {
+          setIsLiked(res.data.liked);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    checkLiked();
+    setLikeCount(post.likes.length);
+  }, [postId]);
+
+  const handleLike = async () => {
+    const id = post._id;
+    if (!isLiked) {
+      await axios
+        .post(`http://localhost:5000/api/posts/${id}/like`, { userId })
+        .then(() => {
+          setLikeCount((prev) => prev + 1);
+          setIsLiked(true);
+        });
+    } else if (isLiked) {
+      await axios
+        .delete(`http://localhost:5000/api/posts/${id}/like`, {
+          data: { userId },
+        })
+        .then(() => {
+          setLikeCount((prev) => prev - 1);
+          setIsLiked(false);
+        });
+    }
+  };
 
   return (
     <div className="flex flex-col rounded-xl overflow-hidden bg-white my-5">
@@ -52,27 +91,22 @@ const Post = ({ post, handleLike, setPostId }) => {
           <div
             className="text-xl cursor-pointer"
             onClick={() => {
-              setIsLiked(!isLiked);
-              setPostId(post._id);
-              handleLike(post._id);
+              handleLike();
             }}
           >
             {isLiked ? (
               <div className="flex items-center justify-center space-x-1">
-                <div
-                  className="flex items-center justify-center w-8 h-8 text-indigo-600"
-                  // onClick={handleLike}
-                >
+                <div className="flex items-center justify-center w-8 h-8 text-indigo-600">
                   <ion-icon name="heart"></ion-icon>
                 </div>
-                <p className="text-base text-indigo-800">231</p>
+                <p className="text-base text-indigo-800">{likeCount}</p>
               </div>
             ) : (
               <div className="flex items-center justify-center space-x-1 hover:text-indigo-800">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-indigo-400 hover:text-indigo-800">
                   <ion-icon name="heart-outline"></ion-icon>
                 </div>
-                <p className="text-base">231</p>
+                <p className="text-base">{likeCount}</p>
               </div>
             )}
           </div>
