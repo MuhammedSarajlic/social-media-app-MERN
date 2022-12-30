@@ -8,17 +8,14 @@ import {
   LaodingPost,
   Navbar,
   Post,
-  PostModal,
 } from "../components";
 import axios from "axios";
 
 const Home = ({ user, handleLogOut }) => {
   const fileInput = useRef(null);
-  const [tempPost, setTempPost] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [isOpen, setIsOpen] = useState({
-    postModal: false,
     addPostModal: false,
   });
   const [posts, setPosts] = useState([]);
@@ -69,10 +66,6 @@ const Home = ({ user, handleLogOut }) => {
     handleRemoveImage();
   };
 
-  const handleOpenPost = () => {
-    setIsOpen({ postModal: !isOpen.postModal });
-  };
-
   const handleRemoveImage = () => {
     setImageUrl("");
     setFormData({ ...formData, imageUrl: "" });
@@ -111,25 +104,10 @@ const Home = ({ user, handleLogOut }) => {
             )}
           </div>
           <div>
-            {/* {isOpen.postModal && (
-              <PostModal
-                handleOpenPost={handleOpenPost}
-                posts={posts}
-                tempPost={tempPost}
-              />
-            )} */}
-          </div>
-          <div>
             {isLoading && <LaodingPost />}
 
             {posts?.map((post, i) => (
-              <Post
-                key={i}
-                post={post}
-                user={user}
-                handleOpenPost={handleOpenPost}
-                setTempPost={setTempPost}
-              />
+              <Post key={i} post={post} user={user} />
             ))}
           </div>
         </div>

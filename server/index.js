@@ -9,7 +9,7 @@ const app = express();
 import { loginStrategy, registerStrategy } from "./routes/index.js";
 import jwt from "jsonwebtoken";
 import Post from "./modules/PostModule.js";
-import User from "./modules/UserModule.js";
+import Comment from "./modules/CommentModule.js";
 
 const PORT = 5000;
 
@@ -28,7 +28,7 @@ app.post("/login", loginStrategy);
 
 app.post("/create-post", async (req, res) => {
   const { description, imageUrl, authorId } = req.body;
-  const user = await User.findOne({ authorId });
+  // const user = await User.findOne({ authorId });
   try {
     const newPost = new Post({
       description,
@@ -44,7 +44,16 @@ app.post("/create-post", async (req, res) => {
 
 app.get("/posts", async (req, res) => {
   try {
-    const post = await Post.find().sort({ createdAt: -1 }).populate("authorId");
+    const post = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("authorId")
+      .populate("comments")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+        },
+      });
     res.send(post);
   } catch (error) {
     res.status(500).send(error.message);
@@ -112,6 +121,24 @@ app.get("/api/posts/:id/like", (req, res) => {
     const liked = post.likes.includes(userId);
     res.send({ liked });
   });
+});
+
+app.post("/api/posts/:id/comments", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, comment } = req.body;
+    const post = await Post.findById(id);
+    const newComment = new Comment({
+      userId,
+      comment,
+    });
+    await newComment.save();
+    post.comments.push(newComment._id);
+    await post.save();
+    res.send("Comment added");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 app.post("/api/protected", (req, res) => {

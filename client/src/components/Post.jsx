@@ -3,9 +3,14 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const Post = ({ post, user, handleOpenPost, setTempPost }) => {
+const Post = ({ post, user }) => {
+  const [postComments, setPostComments] = useState([]);
+  const [commentCount, setCommentCount] = useState(0);
+  const [showAllComments, setShowAllComments] = useState(false);
+  const [comment, setComment] = useState("");
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [isComment, setIsComment] = useState(false);
   const date = moment(post.createdAt).format("MMMM D, YYYY");
   const time = moment(post.createdAt).format("HH:mm");
   const postId = post._id;
@@ -21,6 +26,7 @@ const Post = ({ post, user, handleOpenPost, setTempPost }) => {
     }
     checkLiked();
     setLikeCount(post.likes.length);
+    setCommentCount(post.comments.length);
   }, [postId]);
 
   const handleLike = async () => {
@@ -42,6 +48,25 @@ const Post = ({ post, user, handleOpenPost, setTempPost }) => {
           setIsLiked(false);
         });
     }
+  };
+
+  const addComment = async (e) => {
+    e.preventDefault();
+    await axios
+      .post(`http://localhost:5000/api/posts/${postId}/comments`, {
+        userId,
+        comment,
+      })
+      .then((res) => {
+        setPostComments((prev) => [...prev, comment]);
+        setCommentCount((prev) => prev + 1);
+        setComment("");
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const handleShowComments = () => {
+    setShowAllComments(true);
   };
 
   return (
@@ -111,48 +136,102 @@ const Post = ({ post, user, handleOpenPost, setTempPost }) => {
               <div
                 className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-green-300 hover:text-green-800"
                 onClick={() => {
-                  handleOpenPost();
-                  setTempPost(post);
+                  setIsComment(true);
                 }}
               >
                 <ion-icon name="chatbubbles-outline"></ion-icon>
               </div>
-              <p className="text-base">231</p>
+              <p className="text-base">{commentCount}</p>
             </div>
             <div className="flex items-center justify-center space-x-1 text-xl cursor-pointer hover:text-sky-600">
               <div className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-sky-300 hover:text-sky-800">
                 <ion-icon name="arrow-redo-outline"></ion-icon>
               </div>
-              <p className="text-base">231</p>
             </div>
           </div>
           <div>
             <p className="text-gray-600">{`${time}, ${date}`}</p>
           </div>
         </div>
-        <div className="w-full px-4 py-3">
-          <p className="cursor-pointer font-bold text-base hover:underline">
-            Show all comments
-          </p>
-        </div>
-        <div className="flex items-center px-4 pb-3 space-x-1">
-          <div className="w-11">
-            <img
-              src={post.authorId.imageUrl}
-              alt=""
-              className="w-9 h-9 rounded-full"
-            />
-          </div>
-          <div className="flex items-center w-full h-10 bg-[#f0f2f5] rounded-3xl pr-5">
-            <textarea
-              className="w-full h-10 bg-inherit rounded-3xl border-none resize-none overflow-auto scrollbar-hide focus:ring-0"
-              placeholder="Comment something"
-            />
-            <button className="bg-inherit border-none text-indigo-600 font-bold">
-              Send
-            </button>
-          </div>
-        </div>
+        {isComment && (
+          <>
+            <div className="w-full px-4 py-3">
+              <p
+                className="cursor-pointer font-bold text-base hover:underline"
+                onClick={handleShowComments}
+              >
+                Show all comments
+              </p>
+
+              {showAllComments &&
+                post.comments.map((comment) => (
+                  <div
+                    key={comment._id}
+                    className="flex items-start my-2 space-x-1"
+                  >
+                    <div className="w-10">
+                      <img
+                        src={comment?.userId.imageUrl}
+                        className="w-8 h-8 rounded-full"
+                      />
+                    </div>
+                    <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
+                      <Link
+                        to={`/${comment?.userId.username}`}
+                        className="font-bold"
+                      >{`${comment?.userId.firstName} ${comment?.userId.lastName}`}</Link>
+                      <div>
+                        <p>{comment?.comment}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              {postComments.length > 0 &&
+                postComments.map((comment, i) => (
+                  <div key={i} className="flex items-start my-2 space-x-1">
+                    <div className="w-10">
+                      <img
+                        src={user?.imageUrl}
+                        className="w-8 h-8 rounded-full"
+                      />
+                    </div>
+                    <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
+                      <Link
+                        to={`/${user?.username}`}
+                        className="font-bold"
+                      >{`${user?.firstName} ${user?.lastName}`}</Link>
+                      <div>
+                        <p>{comment}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            <div className="flex items-center px-4 pb-3 space-x-1">
+              <div className="w-11">
+                <img
+                  src={user.imageUrl}
+                  alt=""
+                  className="w-9 h-9 rounded-full"
+                />
+              </div>
+              <div className="flex items-center w-full h-10 bg-[#f0f2f5] rounded-3xl pr-5">
+                <textarea
+                  className="w-full h-10 bg-inherit rounded-3xl border-none resize-none overflow-auto scrollbar-hide focus:ring-0"
+                  placeholder="Comment something"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <button
+                  className="bg-inherit border-none text-indigo-600 font-bold"
+                  onClick={addComment}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

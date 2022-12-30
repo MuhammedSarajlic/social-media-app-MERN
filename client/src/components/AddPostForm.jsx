@@ -41,7 +41,7 @@ const AddPostForm = ({ handleAddPost, formData, handleChange, handleOpen }) => {
         <button
           disabled={!(formData.description || formData.imageUrl)}
           type="submit"
-          className="ml-2 mt-2 focus:outline-none text-white bg-indigo-600 hover:bg-indigo-600 font-medium rounded-xl text-sm px-4 py-2 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+          className="ml-2 mt-2 focus:outline-none text-white bg-indigo-600 hover:bg-indigo-800 font-medium rounded-xl text-sm px-4 py-2 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
         >
           Add post
         </button>
