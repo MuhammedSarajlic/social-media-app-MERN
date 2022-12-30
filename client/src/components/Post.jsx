@@ -175,13 +175,24 @@ const Post = ({ post, user }) => {
                         className="w-8 h-8 rounded-full"
                       />
                     </div>
-                    <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
-                      <Link
-                        to={`/${comment?.userId.username}`}
-                        className="font-bold"
-                      >{`${comment?.userId.firstName} ${comment?.userId.lastName}`}</Link>
-                      <div>
-                        <p>{comment?.comment}</p>
+                    <div className="w-full">
+                      <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
+                        <Link
+                          to={`/${comment?.userId.username}`}
+                          className="font-bold"
+                        >{`${comment?.userId.firstName} ${comment?.userId.lastName}`}</Link>
+                        <div>
+                          <p>{comment?.comment}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-end space-x-2 px-2 py-1">
+                        <p className="text-sm hover:underline cursor-pointer">
+                          Like
+                        </p>
+                        <p className="text-sm text-gray-600 hover:underline cursor-pointer">
+                          {moment(comment.createdAt).fromNow()}
+                        </p>
                       </div>
                     </div>
                   </div>
