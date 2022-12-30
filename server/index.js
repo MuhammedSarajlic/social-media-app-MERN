@@ -123,6 +123,21 @@ app.get("/api/posts/:id/like", (req, res) => {
   });
 });
 
+app.get("/api/posts/:id/comments", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Post.findById(id)
+      .populate("comments")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+        },
+      });
+    res.send(post);
+  } catch (error) {}
+});
+
 app.post("/api/posts/:id/comments", async (req, res) => {
   try {
     const { id } = req.params;
@@ -138,6 +153,17 @@ app.post("/api/posts/:id/comments", async (req, res) => {
     res.send("Comment added");
   } catch (error) {
     res.status(500).send(error.message);
+  }
+});
+
+app.delete("/api/posts/:id/comments", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Comment.findByIdAndDelete(id);
+    await Post.updateOne({ comments: id }, { $pull: { comments: id } });
+    res.send({ message: "Comment deleted successfully" });
+  } catch (error) {
+    res.status(500).send(error);
   }
 });
 

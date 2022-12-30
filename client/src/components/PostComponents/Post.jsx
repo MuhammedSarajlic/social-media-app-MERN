@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Comment } from "../index";
 
 const Post = ({ post, user }) => {
   const [postComments, setPostComments] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
   const [showAllComments, setShowAllComments] = useState(false);
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isComment, setIsComment] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const date = moment(post.createdAt).format("MMMM D, YYYY");
   const time = moment(post.createdAt).format("HH:mm");
   const postId = post._id;
@@ -25,6 +28,14 @@ const Post = ({ post, user }) => {
         });
     }
     checkLiked();
+    async function getComments() {
+      await axios
+        .get(`http://localhost:5000/api/posts/${post._id}/comments`)
+        .then((res) => {
+          setComments(res.data.comments);
+        });
+    }
+    getComments();
     setLikeCount(post.likes.length);
     setCommentCount(post.comments.length);
   }, [postId]);
@@ -139,7 +150,7 @@ const Post = ({ post, user }) => {
                   setIsComment(true);
                 }}
               >
-                <ion-icon name="chatbubbles-outline"></ion-icon>
+                <ion-icon name="chatbubble-outline"></ion-icon>
               </div>
               <p className="text-base">{commentCount}</p>
             </div>
@@ -164,38 +175,68 @@ const Post = ({ post, user }) => {
               </p>
 
               {showAllComments &&
-                post.comments.map((comment) => (
-                  <div
+                comments.map((comment) => (
+                  <Comment
                     key={comment._id}
-                    className="flex items-start my-2 space-x-1"
-                  >
-                    <div className="w-10">
-                      <img
-                        src={comment?.userId.imageUrl}
-                        className="w-8 h-8 rounded-full"
-                      />
-                    </div>
-                    <div className="w-full">
-                      <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
-                        <Link
-                          to={`/${comment?.userId.username}`}
-                          className="font-bold"
-                        >{`${comment?.userId.firstName} ${comment?.userId.lastName}`}</Link>
-                        <div>
-                          <p>{comment?.comment}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-end space-x-2 px-2 py-1">
-                        <p className="text-sm hover:underline cursor-pointer">
-                          Like
-                        </p>
-                        <p className="text-sm text-gray-600 hover:underline cursor-pointer">
-                          {moment(comment.createdAt).fromNow()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                    comment={comment}
+                    comments={comments}
+                    setComments={setComments}
+                    setCommentCount={setCommentCount}
+                  />
+                  // <div
+                  //   key={comment._id}
+                  //   className="flex items-start my-2 space-x-1"
+                  // >
+                  //   <div className="w-10">
+                  //     <img
+                  //       src={comment?.userId.imageUrl}
+                  //       className="w-8 h-8 rounded-full"
+                  //     />
+                  //   </div>
+                  //   <div>
+                  //     <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
+                  //       <Link
+                  //         to={`/${comment?.userId.username}`}
+                  //         className="font-bold"
+                  //       >{`${comment?.userId.firstName} ${comment?.userId.lastName}`}</Link>
+                  //       <div>
+                  //         <p>{comment?.comment}</p>
+                  //       </div>
+                  //     </div>
+                  //     <div className="flex items-end space-x-2 px-2 py-1">
+                  //       <p className="text-sm hover:underline cursor-pointer font-bold text-[#65676b]">
+                  //         Like
+                  //       </p>
+                  //       <p className="text-sm text-[#65676b] hover:underline cursor-pointer">
+                  //         {moment(comment.createdAt).fromNow()}
+                  //       </p>
+                  //     </div>
+                  //   </div>
+                  //   <div
+                  //     className="relative flex items-center justify-center p-2 cursor-pointer text-lg rounded-full hover:bg-[#f0f2f5]"
+                  //     onClick={() => setIsOpen(!isOpen)}
+                  //   >
+                  //     <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                  //     {isOpen && (
+                  //       <div className="absolute left-0 top-0 mt-8 w-32 rounded-md shadow-lg z-10">
+                  //         <div className="py-1 rounded-md bg-white shadow-xs">
+                  //           <a
+                  //             href="#"
+                  //             className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
+                  //           >
+                  //             Edit
+                  //           </a>
+                  //           <div
+                  //             href="#"
+                  //             className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
+                  //           >
+                  //             Delete
+                  //           </div>
+                  //         </div>
+                  //       </div>
+                  //     )}
+                  //   </div>
+                  // </div>
                 ))}
               {postComments.length > 0 &&
                 postComments.map((comment, i) => (
@@ -206,14 +247,45 @@ const Post = ({ post, user }) => {
                         className="w-8 h-8 rounded-full"
                       />
                     </div>
-                    <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
-                      <Link
-                        to={`/${user?.username}`}
-                        className="font-bold"
-                      >{`${user?.firstName} ${user?.lastName}`}</Link>
-                      <div>
-                        <p>{comment}</p>
+                    <div>
+                      <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
+                        <Link
+                          to={`/${user?.username}`}
+                          className="font-bold"
+                        >{`${user?.firstName} ${user?.lastName}`}</Link>
+                        <div>
+                          <p>{comment}</p>
+                        </div>
                       </div>
+                      <div className="flex items-end space-x-2 px-2 py-1">
+                        <p className="text-sm hover:underline cursor-pointer font-bold text-[#65676b]">
+                          Like
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      className="flex items-center justify-center p-2 cursor-pointer text-lg rounded-full hover:bg-[#f0f2f5]"
+                      onClick={() => setIsOpen(!isOpen)}
+                    >
+                      <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                      {isOpen && (
+                        <div className="absolute left-0 top-0 mt-8 w-32 rounded-md shadow-lg z-10">
+                          <div className="py-1 rounded-md bg-white shadow-xs">
+                            <a
+                              href="#"
+                              className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
+                            >
+                              Edit
+                            </a>
+                            <a
+                              href="#"
+                              className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
+                            >
+                              Delete
+                            </a>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
