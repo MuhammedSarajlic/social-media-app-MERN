@@ -1,17 +1,24 @@
 import axios from "axios";
-import moment from "moment";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Comment = ({ comment, comments, setComments, setCommentCount }) => {
-  const commentId = comment._id;
+const TempComment = ({
+  user,
+  comment,
+  setPostComments,
+  postComments,
+  setCommentCount,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const commentId = comment._id;
 
   const handleDeleteComment = () => {
     axios
       .delete(`http://localhost:5000/api/posts/${commentId}/comments`)
       .then(() => {
-        setComments(comments.filter((comment) => comment._id !== commentId));
+        setPostComments(
+          postComments.filter((comment) => comment._id !== commentId)
+        );
         setCommentCount((prev) => prev - 1);
       })
       .catch((error) => console.log(error));
@@ -19,19 +26,17 @@ const Comment = ({ comment, comments, setComments, setCommentCount }) => {
 
   return (
     <>
+      {console.log(isOpen)}
       <div className="flex items-start my-2 space-x-1">
         <div className="w-10">
-          <img
-            src={comment?.userId.imageUrl}
-            className="w-8 h-8 rounded-full"
-          />
+          <img src={user?.imageUrl} className="w-8 h-8 rounded-full" />
         </div>
         <div>
           <div className="w-full h-full bg-[#f0f2f5] p-2 rounded-2xl">
             <Link
-              to={`/${comment?.userId.username}`}
+              to={`/${user?.username}`}
               className="font-bold"
-            >{`${comment?.userId.firstName} ${comment?.userId.lastName}`}</Link>
+            >{`${user?.firstName} ${user?.lastName}`}</Link>
             <div>
               <p>{comment?.comment}</p>
             </div>
@@ -39,9 +44,6 @@ const Comment = ({ comment, comments, setComments, setCommentCount }) => {
           <div className="flex items-end space-x-2 px-2 py-1">
             <p className="text-sm hover:underline cursor-pointer font-bold text-[#65676b]">
               Like
-            </p>
-            <p className="text-sm text-[#65676b] hover:underline cursor-pointer">
-              {moment(comment.createdAt).fromNow()}
             </p>
           </div>
         </div>
@@ -73,4 +75,4 @@ const Comment = ({ comment, comments, setComments, setCommentCount }) => {
   );
 };
 
-export default Comment;
+export default TempComment;

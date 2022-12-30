@@ -150,7 +150,8 @@ app.post("/api/posts/:id/comments", async (req, res) => {
     await newComment.save();
     post.comments.push(newComment._id);
     await post.save();
-    res.send("Comment added");
+    // const commentId = newComment._id;
+    res.send(newComment);
   } catch (error) {
     res.status(500).send(error.message);
   }
