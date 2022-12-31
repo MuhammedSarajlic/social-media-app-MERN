@@ -10,6 +10,7 @@ import { loginStrategy, registerStrategy } from "./routes/index.js";
 import jwt from "jsonwebtoken";
 import Post from "./modules/PostModule.js";
 import Comment from "./modules/CommentModule.js";
+import User from "./modules/UserModule.js";
 
 const PORT = 5000;
 
@@ -25,6 +26,16 @@ app.get("/", (req, res) => {
 app.post("/register", registerStrategy);
 
 app.post("/login", loginStrategy);
+
+app.get("/users", async (req, res) => {
+  try {
+    const { username } = req.query;
+    const user = await User.findOne({ username });
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 app.post("/create-post", async (req, res) => {
   const { description, imageUrl, authorId } = req.body;

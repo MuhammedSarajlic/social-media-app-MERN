@@ -3,7 +3,14 @@ import moment from "moment";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Comment = ({ comment, comments, setComments, setCommentCount }) => {
+const Comment = ({
+  user,
+  post,
+  comment,
+  comments,
+  setComments,
+  setCommentCount,
+}) => {
   const commentId = comment._id;
   const [isOpen, setIsOpen] = useState(false);
 

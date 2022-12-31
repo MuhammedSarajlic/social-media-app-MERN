@@ -11,6 +11,7 @@ const LoadingPost = () => {
             <div className="h-2 w-10 bg-gray-400 rounded-lg"></div>
           </div>
         </div>
+        <div className="h-60"></div>
         <div className="max-w-full flex items-center pt-3 space-x-2">
           <div className="flex items-center justify-center text-xl w-8 h-8 rounded-full text-gray-400">
             <ion-icon name="heart-outline"></ion-icon>
