@@ -3,7 +3,7 @@ import React from "react";
 const AddPostForm = ({ handleAddPost, formData, handleChange, handleOpen }) => {
   return (
     <>
-      <form onSubmit={handleAddPost}>
+      <form onSubmit={handleAddPost} className="mb-5">
         <div className="h-5 w-full border-b-[1px] py-5 flex items-center">
           <p className="font-bold px-4">Add post</p>
         </div>

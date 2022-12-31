@@ -119,19 +119,19 @@ app.delete("/api/posts/:id/like", (req, res) => {
   });
 });
 
-app.get("/api/posts/:id/like", (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.query;
-  Post.findById(id, (error, post) => {
-    if (error) {
-      return res.status(500).send({ error: "Error getting post" });
-    }
+app.get("/api/posts/:id/like", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.query;
+    const post = await Post.findById(id);
     if (!post) {
-      return res.status(404).send({ error: "Post not found" });
+      return res.status(404).send("Post not found!");
     }
     const liked = post.likes.includes(userId);
     res.send({ liked });
-  });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 app.get("/api/posts/:id/comments", async (req, res) => {

@@ -20,14 +20,16 @@ const UserProfile = ({ user, handleLogOut }) => {
   return (
     <>
       <Navbar user={user} handleLogOut={handleLogOut} />
-      <div className="">
+      <div className="bg-[#f0f2f5] h-full">
         <div className="relative max-w-5xl mx-auto">
-          <div className="absolute w-1/3 t-0 mt-48 overflow-hidden z-10">
-            <img
-              src={openedUser?.imageUrl}
-              alt=""
-              className="w-60 h-60 border-8 border-white rounded-full mx-auto"
-            />
+          <div className="absolute w-1/3 t-0 mt-48 z-10">
+            <div className="w-60 h-60 border-8 border-white overflow-hidden rounded-full bg-center">
+              <img
+                src={openedUser?.imageUrl}
+                alt=""
+                className="w-full h-full"
+              />
+            </div>
           </div>
         </div>
         <div>
@@ -40,8 +42,8 @@ const UserProfile = ({ user, handleLogOut }) => {
           </div>
           <div className="w-full h-48 bg-white drop-shadow-lg">
             <div className="flex max-w-5xl mx-auto h-full space-x-8">
-              <div className="w-1/3"></div>
-              <div className="w-2/3 h-full py-2 space-y-3">
+              <div className="w-1/4"></div>
+              <div className="w-3/4 h-full py-2  space-y-3">
                 <p className="text-4xl font-bold">{`${openedUser?.firstName} ${openedUser?.lastName}`}</p>
                 <p className="text-lg">@{openedUser?.username}</p>
                 <div className="flex space-x-3">
@@ -52,15 +54,15 @@ const UserProfile = ({ user, handleLogOut }) => {
                   <p className="font-bold text-lg">0 Following</p>
                 </div>
                 <div className="flex space-x-4">
-                  <div className="flex h-full items-center justify-center px-2 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
+                  <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
                     <ion-icon name="person-add-outline"></ion-icon>
                     <p>Add friend</p>
                   </div>
-                  <div className="flex h-full items-center justify-center px-2 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
+                  <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
                     <ion-icon name="heart-outline"></ion-icon>
                     <p>Follow</p>
                   </div>
-                  <div className="flex h-full items-center justify-center px-2 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
+                  <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
                     <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
                     <p>Message</p>
                   </div>
@@ -70,20 +72,20 @@ const UserProfile = ({ user, handleLogOut }) => {
           </div>
         </div>
 
-        <div className="flex max-w-5xl mx-auto h-screen bg-orange-700 mt-10 space-x-8">
-          <div className="w-1/3 h-48 bg-gray-400"></div>
-          <div className="w-2/3 h-48 bg-gray-800">
+        <div className="flex max-w-5xl mx-auto h-full mt-10 space-x-8">
+          <div className="w-2/3 h-full">
             {posts.length > 0 ? (
               posts?.map(
                 (post) =>
                   post.authorId._id === openedUser._id && (
-                    <Post key={post._id} post={post} user={openedUser} />
+                    <Post key={post._id} post={post} user={user} />
                   )
               )
             ) : (
               <LaodingPost />
             )}
           </div>
+          <div className="w-1/3 h-48 bg-gray-400"></div>
         </div>
       </div>
     </>

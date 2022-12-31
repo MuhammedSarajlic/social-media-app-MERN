@@ -82,7 +82,7 @@ const Post = ({ post, user }) => {
 
   return (
     <>
-      <div className="flex flex-col rounded-xl overflow-hidden bg-white my-5">
+      <div className="flex flex-col rounded-xl overflow-hidden bg-white mb-5">
         <div className="flex flex-col">
           <div className="flex items-center justify-between px-4 py-2">
             <div className="flex items-center space-x-4">
