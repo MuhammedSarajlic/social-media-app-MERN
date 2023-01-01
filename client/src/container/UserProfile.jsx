@@ -14,6 +14,8 @@ const UserProfile = ({ user, handleLogOut }) => {
   const [isFriend, setIsFriend] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const userId = user?._id;
+  const id = openedUser?._id;
 
   useEffect(() => {
     axios
@@ -28,10 +30,9 @@ const UserProfile = ({ user, handleLogOut }) => {
   }, [user]);
 
   const handleFollow = () => {
-    const userId = openedUser._id;
     axios
-      .post(`http://localhost:5000/api/users/${userId}/follow`, {
-        userId: user?._id,
+      .post(`http://localhost:5000/api/users/${id}/follow`, {
+        userId,
       })
       .then(() => {
         setFollowersCount((prev) => prev + 1);
@@ -39,18 +40,18 @@ const UserProfile = ({ user, handleLogOut }) => {
   };
 
   const handleUnfollow = () => {
-    const userId = openedUser._id;
     axios
-      .post(`http://localhost:5000/api/users/${userId}/unfollow`, {
-        userId: user?._id,
+      .post(`http://localhost:5000/api/users/${id}/unfollow`, {
+        userId,
       })
-      .then((res) => setFollowersCount((prev) => prev - 1));
+      .then(() => setFollowersCount((prev) => prev - 1));
   };
 
   if (!user || !openedUser) return <div>Loading...</div>;
 
   return (
     <>
+      {console.log(userId)}
       <Navbar user={user} handleLogOut={handleLogOut} />
       <div className="bg-[#f0f2f5] h-full">
         <div className="relative max-w-5xl mx-auto">

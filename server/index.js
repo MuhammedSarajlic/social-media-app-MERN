@@ -65,6 +65,7 @@ app.post("/api/users/:id/follow", async (req, res) => {
     }
     actionUser.following.push(id);
     await actionUser.save();
+    res.send({ success: true });
   } catch (error) {
     res.status(500).send(error.message);
   }

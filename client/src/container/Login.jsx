@@ -14,9 +14,8 @@ const Login = ({ setIsAuthenticated, setCurrentUserEmail }) => {
 
   useEffect(() => {
     const token = Cookies.get("jwt_token");
-    //Cookies.remove("jwt_token");
     if (token) {
-      //navigate("/");
+      navigate("/");
     }
   }, []);
 
