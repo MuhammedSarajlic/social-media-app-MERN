@@ -47,6 +47,49 @@ app.get("/user", async (req, res) => {
   }
 });
 
+app.post("/api/users/:id/follow", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+    const user = await User.findById(id);
+    const actionUser = await User.findById(userId);
+    const isFollower = user.followers.indexOf(userId);
+    if (isFollower !== -1) {
+      return res.send("Already following user");
+    }
+    user.followers.push(userId);
+    await user.save();
+    const isFollowing = actionUser.following.indexOf(id);
+    if (isFollowing !== -1) {
+      return res.send("Already following user");
+    }
+    actionUser.following.push(id);
+    await actionUser.save();
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.post("/api/users/:id/unfollow", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    // Find the user who is being unfollowed
+    const user = await User.findById(id);
+    // Remove the user's ID from the followers array
+    user.followers = user.followers.filter(
+      (follower) => follower.toString() !== userId
+    );
+    // Save the updated user document
+    await user.save();
+
+    res.send("Unfollowed");
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 app.post("/create-post", async (req, res) => {
   const { description, imageUrl, authorId } = req.body;
   try {

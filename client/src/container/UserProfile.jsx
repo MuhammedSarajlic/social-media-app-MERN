@@ -9,13 +9,45 @@ const UserProfile = ({ user, handleLogOut }) => {
   const { username } = useParams();
   const [posts, setPosts] = useState([]);
   const [openedUser, setOpenedUser] = useState();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [sentRequest, setSentRequest] = useState(false);
+  const [isFriend, setIsFriend] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
 
   useEffect(() => {
     axios
       .get(`http://localhost:5000/users?username=${username}`)
-      .then((res) => setOpenedUser(res.data));
+      .then((res) => {
+        setOpenedUser(res.data);
+        setFollowersCount(res.data.followers.length);
+        setFollowingCount(res.data.following.length);
+        setIsFollowing(res.data.followers.includes(user?._id));
+      });
     axios.get("http://localhost:5000/posts").then((res) => setPosts(res.data));
-  }, []);
+  }, [user]);
+
+  const handleFollow = () => {
+    const userId = openedUser._id;
+    axios
+      .post(`http://localhost:5000/api/users/${userId}/follow`, {
+        userId: user?._id,
+      })
+      .then(() => {
+        setFollowersCount((prev) => prev + 1);
+      });
+  };
+
+  const handleUnfollow = () => {
+    const userId = openedUser._id;
+    axios
+      .post(`http://localhost:5000/api/users/${userId}/unfollow`, {
+        userId: user?._id,
+      })
+      .then((res) => setFollowersCount((prev) => prev - 1));
+  };
+
+  if (!user || !openedUser) return <div>Loading...</div>;
 
   return (
     <>
@@ -49,24 +81,73 @@ const UserProfile = ({ user, handleLogOut }) => {
                 <div className="flex space-x-3">
                   <p className="font-bold text-lg">0 Friends</p>
                   <p>&#x2022;</p>
-                  <p className="font-bold text-lg">0 Followers</p>
+                  <p className="font-bold text-lg">{`${followersCount} Followers`}</p>
                   <p>&#x2022;</p>
-                  <p className="font-bold text-lg">0 Following</p>
+                  <p className="font-bold text-lg">{`${followingCount} Following`}</p>
                 </div>
-                <div className="flex space-x-4">
-                  <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
-                    <ion-icon name="person-add-outline"></ion-icon>
-                    <p>Add friend</p>
+                {openedUser?._id !== user?._id ? (
+                  <div className="flex space-x-4">
+                    {sentRequest ? (
+                      <div
+                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer"
+                        onClick={() => setSentRequest(!sentRequest)}
+                      >
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <p>Friend request sent</p>
+                      </div>
+                    ) : isFriend ? (
+                      <div
+                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-white cursor-pointer"
+                        onClick={() => setIsFriend(false)}
+                      >
+                        <ion-icon name="person"></ion-icon>
+                        <p>Friends</p>
+                      </div>
+                    ) : (
+                      <div
+                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold text-white cursor-pointer"
+                        onClick={() => setSentRequest(!sentRequest)}
+                      >
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        <p>Add friend</p>
+                      </div>
+                    )}
+                    {isFollowing ? (
+                      <div
+                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-white cursor-pointer"
+                        onClick={() => {
+                          setIsFollowing(!isFollowing);
+                          handleUnfollow();
+                        }}
+                      >
+                        <ion-icon name="heart"></ion-icon>
+                        <p>Following</p>
+                      </div>
+                    ) : (
+                      <div
+                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer"
+                        onClick={() => {
+                          setIsFollowing(!isFollowing);
+                          handleFollow();
+                        }}
+                      >
+                        <ion-icon name="heart-outline"></ion-icon>
+                        <p>Follow</p>
+                      </div>
+                    )}
+                    <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 border-2 border-indigo-600 text-white cursor-pointer">
+                      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                      <p>Message</p>
+                    </div>
                   </div>
-                  <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
-                    <ion-icon name="heart-outline"></ion-icon>
-                    <p>Follow</p>
+                ) : (
+                  <div className="flex">
+                    <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-white cursor-pointer">
+                      <ion-icon name="code-slash"></ion-icon>
+                      <p>Edit Profile</p>
+                    </div>
                   </div>
-                  <div className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl bg-indigo-600 text-white cursor-pointer">
-                    <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-                    <p>Message</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
