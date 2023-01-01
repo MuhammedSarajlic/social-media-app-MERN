@@ -107,7 +107,13 @@ const Home = ({ user, handleLogOut }) => {
             {isLoading && <LoadingPost />}
 
             {posts.length > 0 ? (
-              posts?.map((post, i) => <Post key={i} post={post} user={user} />)
+              posts?.map(
+                (post, i) =>
+                  (user.following.includes(post.authorId._id) ||
+                    post.authorId._id === user._id) && (
+                    <Post key={i} post={post} user={user} />
+                  )
+              )
             ) : (
               <LoadingPost />
             )}

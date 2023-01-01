@@ -51,7 +51,6 @@ const UserProfile = ({ user, handleLogOut }) => {
 
   return (
     <>
-      {console.log(userId)}
       <Navbar user={user} handleLogOut={handleLogOut} />
       <div className="bg-[#f0f2f5] h-full">
         <div className="relative max-w-5xl mx-auto">
