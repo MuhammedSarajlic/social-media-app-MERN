@@ -6,14 +6,25 @@ import { Home, Register, Login, UserProfile } from "./container/index";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   const handleLogOut = () => {
     Cookies.remove("jwt_token");
+    setCurrentUserEmail("");
     setIsAuthenticated(false);
     setUser(null);
     navigate("/login");
+  };
+
+  const getUser = async () => {
+    await axios
+      .get(`http://localhost:5000/user?email=${currentUserEmail}`)
+      .then((res) => {
+        setUser(res.data);
+      })
+      .catch((error) => console.log(error));
   };
 
   useEffect(() => {
@@ -27,10 +38,11 @@ function App() {
           },
         })
         .then((response) => {
-          setUser(response.data.user.user);
+          setCurrentUserEmail(response.data.user.email);
         });
+      getUser();
     }
-  }, [isAuthenticated]);
+  }, [currentUserEmail]);
 
   return (
     <>
@@ -46,14 +58,22 @@ function App() {
                   handleLogOut={handleLogOut}
                 />
               ) : (
-                <Login setIsAuthenticated={setIsAuthenticated} />
+                <Login
+                  setIsAuthenticated={setIsAuthenticated}
+                  setCurrentUserEmail={setCurrentUserEmail}
+                />
               )
             }
           />
           <Route path="/register" element={<Register />} />
           <Route
             path="/login"
-            element={<Login setIsAuthenticated={setIsAuthenticated} />}
+            element={
+              <Login
+                setIsAuthenticated={setIsAuthenticated}
+                setCurrentUserEmail={setCurrentUserEmail}
+              />
+            }
           />
           <Route
             path="/:username"

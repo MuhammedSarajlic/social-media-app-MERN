@@ -14,6 +14,7 @@ const Register = () => {
     imageUrl: "",
   });
   const [error, setError] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,18 +24,34 @@ const Register = () => {
     }
   }, []);
 
-  const handleRegister = (e) => {
+  const getProfileImage = (firstName, lastName) => {
+    const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
+    const canvas = document.createElement("canvas");
+    canvas.width = 100;
+    canvas.height = 100;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "rgb(107 114 128)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "48px sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, canvas.width / 2, canvas.height / 2);
+    setProfileImage(canvas.toDataURL());
+  };
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, username, email, password, imageUrl } = user;
+    const { firstName, lastName, username, email, password } = user;
     const lowerCaseUsername = username.toLowerCase();
-    axios
+    await axios
       .post("http://localhost:5000/register", {
         firstName,
         lastName,
         username: lowerCaseUsername,
         email,
         password,
-        imageUrl,
+        imageUrl: profileImage,
       })
       .then(() => {
         setUser({
@@ -59,6 +76,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     setUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    getProfileImage(user.firstName, user.lastName);
   };
 
   return (

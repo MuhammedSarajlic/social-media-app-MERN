@@ -15,7 +15,7 @@ export default async function loginStrategy(req, res) {
     if (!isValidPassword) {
       return res.status(401).send({ error: "Invalid email or password" });
     }
-    const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
       expiresIn: rememberMe ? "7d" : "24h",
     });
     res.send({ token, user });

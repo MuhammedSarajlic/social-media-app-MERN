@@ -68,7 +68,6 @@ const Post = ({ post, user }) => {
         comment,
       })
       .then((res) => {
-        console.log(res.data);
         setPostComments((prev) => [...prev, res.data]);
         setCommentCount((prev) => prev + 1);
         setComment("");
@@ -87,20 +86,11 @@ const Post = ({ post, user }) => {
           <div className="flex items-center justify-between px-4 py-2">
             <div className="flex items-center space-x-4">
               <div className="w-10 h-10 rounded-full overflow-hidden">
-                {post?.authorId.imageUrl ? (
-                  <img
-                    src={post?.authorId.imageUrl}
-                    alt=""
-                    className="w-full h-full"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-500">
-                    <p className="text-white font-bold text-lg">
-                      {post?.authorId.firstName.charAt(0)}
-                      {post?.authorId.lastName.charAt(0)}
-                    </p>
-                  </div>
-                )}
+                <img
+                  src={post?.authorId.imageUrl}
+                  alt=""
+                  className="w-full h-full"
+                />
               </div>
               <div>
                 <Link to={`/${post?.authorId.username}`}>
@@ -187,7 +177,7 @@ const Post = ({ post, user }) => {
                   />
                 ))}
               {postComments.length > 0 &&
-                postComments.map((comment, i) => (
+                postComments.map((comment) => (
                   <TempComment
                     key={comment._id}
                     user={user}
@@ -201,7 +191,7 @@ const Post = ({ post, user }) => {
             <div className="flex items-center px-4 pb-3 space-x-1">
               <div className="w-11">
                 <img
-                  src={user.imageUrl}
+                  src={user?.imageUrl}
                   alt=""
                   className="w-9 h-9 rounded-full"
                 />

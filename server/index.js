@@ -37,9 +37,18 @@ app.get("/users", async (req, res) => {
   }
 });
 
+app.get("/user", async (req, res) => {
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ email });
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 app.post("/create-post", async (req, res) => {
   const { description, imageUrl, authorId } = req.body;
-  // const user = await User.findOne({ authorId });
   try {
     const newPost = new Post({
       description,
@@ -161,7 +170,6 @@ app.post("/api/posts/:id/comments", async (req, res) => {
     await newComment.save();
     post.comments.push(newComment._id);
     await post.save();
-    // const commentId = newComment._id;
     res.send(newComment);
   } catch (error) {
     res.status(500).send(error.message);

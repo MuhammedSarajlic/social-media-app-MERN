@@ -3,7 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { LaodingPost, Navbar, Post } from "../components";
+import { LoadingPost, Navbar, Post } from "../components";
 
 const UserProfile = ({ user, handleLogOut }) => {
   const { username } = useParams();
@@ -82,7 +82,7 @@ const UserProfile = ({ user, handleLogOut }) => {
                   )
               )
             ) : (
-              <LaodingPost />
+              <LoadingPost />
             )}
           </div>
           <div className="w-1/3 h-48 bg-gray-400"></div>

@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = ({ setIsAuthenticated, setCurrentUserEmail }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -33,6 +33,7 @@ const Login = ({ setIsAuthenticated }) => {
           expiresIn: rememberMe ? "7d" : "24h",
         });
         setIsAuthenticated(true);
+        setCurrentUserEmail(email);
         setEmail("");
         setPassword("");
         navigate("/");

@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   AddPostForm,
   AddPostModal,
-  LaodingPost,
+  LoadingPost,
   Navbar,
   Post,
 } from "../components";
@@ -104,11 +104,13 @@ const Home = ({ user, handleLogOut }) => {
             )}
           </div>
           <div>
-            {isLoading && <LaodingPost />}
+            {isLoading && <LoadingPost />}
 
-            {posts?.map((post, i) => (
-              <Post key={i} post={post} user={user} />
-            ))}
+            {posts.length > 0 ? (
+              posts?.map((post, i) => <Post key={i} post={post} user={user} />)
+            ) : (
+              <LoadingPost />
+            )}
           </div>
         </div>
         <div className="w-1/3 bg-lime-600">Suggest</div>
