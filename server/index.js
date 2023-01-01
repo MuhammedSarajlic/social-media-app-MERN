@@ -74,16 +74,16 @@ app.post("/api/users/:id/unfollow", async (req, res) => {
   try {
     const { id } = req.params;
     const { userId } = req.body;
-
-    // Find the user who is being unfollowed
     const user = await User.findById(id);
-    // Remove the user's ID from the followers array
+    const actionUser = await User.findById(userId);
     user.followers = user.followers.filter(
       (follower) => follower.toString() !== userId
     );
-    // Save the updated user document
     await user.save();
-
+    actionUser.following = actionUser.following.filter(
+      (following) => following.toString() !== id
+    );
+    await actionUser.save();
     res.send("Unfollowed");
   } catch (error) {
     res.status(500).send(error);
