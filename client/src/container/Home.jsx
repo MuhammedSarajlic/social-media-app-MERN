@@ -110,7 +110,8 @@ const Home = ({ user, handleLogOut }) => {
               posts?.map(
                 (post, i) =>
                   (user.following.includes(post.authorId._id) ||
-                    post.authorId._id === user._id) && (
+                    post.authorId._id === user._id ||
+                    user.friends.includes(post.authorId._id)) && (
                     <Post key={i} post={post} user={user} />
                   )
               )

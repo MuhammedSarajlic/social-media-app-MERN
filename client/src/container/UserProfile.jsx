@@ -3,7 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { LoadingPost, Navbar, Post } from "../components";
+import { LoadingPost, Navbar, Post, RemoveFriendModal } from "../components";
 
 const UserProfile = ({ user, handleLogOut }) => {
   const { username } = useParams();
@@ -12,8 +12,11 @@ const UserProfile = ({ user, handleLogOut }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [sentRequest, setSentRequest] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
+  const [receivedFriendRequest, setReceivedFriendRequest] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [friendsCount, setFriendsCount] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const userId = user?._id;
   const id = openedUser?._id;
 
@@ -24,10 +27,26 @@ const UserProfile = ({ user, handleLogOut }) => {
         setOpenedUser(res.data);
         setFollowersCount(res.data.followers.length);
         setFollowingCount(res.data.following.length);
+        setFriendsCount(res.data.friends.length);
         setIsFollowing(res.data.followers.includes(user?._id));
+        setIsFriend(res.data.friends.includes(userId));
       });
     axios.get("http://localhost:5000/posts").then((res) => setPosts(res.data));
-  }, [user]);
+  }, [user, username]);
+
+  useEffect(() => {
+    userId && id && getFriend();
+  }, [openedUser, receivedFriendRequest]);
+
+  const getFriend = () => {
+    axios
+      .get(`http://localhost:5000/friend-request/${id}/check?userId=${userId}`)
+      .then((res) => {
+        res.data.status === "pending" && setSentRequest(true);
+        res.data.status === "accepted" && setIsFriend(true);
+        setReceivedFriendRequest(res.data.receiverId === userId);
+      });
+  };
 
   const handleFollow = () => {
     axios
@@ -47,12 +66,61 @@ const UserProfile = ({ user, handleLogOut }) => {
       .then(() => setFollowersCount((prev) => prev - 1));
   };
 
+  const handleSendFriendRequest = () => {
+    axios
+      .post("http://localhost:5000/friend-request/send", {
+        senderId: userId,
+        receiverId: id,
+      })
+      .then(() => {
+        setSentRequest(true);
+      });
+  };
+
+  const handleRemoveFriendRequest = () => {
+    axios
+      .delete("http://localhost:5000/friend-request/remove", {
+        data: { senderId: userId, receiverId: id },
+      })
+      .then(() => setSentRequest(false));
+  };
+
+  const handleChangeRequestStatus = async (status) => {
+    await axios
+      .patch("http://localhost:5000/friend-request/status", {
+        senderId: id,
+        receiverId: userId,
+        status,
+      })
+      .then((res) => {
+        res.data.status === "accepted" && setFriendsCount((prev) => prev + 1);
+      });
+  };
+
+  const handleRemoveFriend = () => {
+    axios
+      .delete("http://localhost:5000/friend/remove", {
+        data: { senderId: userId, receiverId: id },
+      })
+      .then(() => {
+        setIsFriend(false);
+        setFriendsCount((prev) => prev - 1);
+      });
+  };
+
   if (!user || !openedUser) return <div>Loading...</div>;
 
   return (
     <>
       <Navbar user={user} handleLogOut={handleLogOut} />
       <div className="bg-[#f0f2f5] h-full">
+        {isModalOpen && (
+          <RemoveFriendModal
+            setIsModalOpen={setIsModalOpen}
+            username={username}
+            handleRemoveFriend={handleRemoveFriend}
+          />
+        )}
         <div className="relative max-w-5xl mx-auto">
           <div className="absolute w-1/3 t-0 mt-48 z-10">
             <div className="w-60 h-60 border-8 border-white overflow-hidden rounded-full bg-center">
@@ -79,7 +147,7 @@ const UserProfile = ({ user, handleLogOut }) => {
                 <p className="text-4xl font-bold">{`${openedUser?.firstName} ${openedUser?.lastName}`}</p>
                 <p className="text-lg">@{openedUser?.username}</p>
                 <div className="flex space-x-3">
-                  <p className="font-bold text-lg">0 Friends</p>
+                  <p className="font-bold text-lg">{`${friendsCount} Friends`}</p>
                   <p>&#x2022;</p>
                   <p className="font-bold text-lg">{`${followersCount} Followers`}</p>
                   <p>&#x2022;</p>
@@ -87,30 +155,63 @@ const UserProfile = ({ user, handleLogOut }) => {
                 </div>
                 {openedUser?._id !== user?._id ? (
                   <div className="flex space-x-4">
-                    {sentRequest ? (
-                      <div
-                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer"
-                        onClick={() => setSentRequest(!sentRequest)}
-                      >
-                        <ion-icon name="person-add-outline"></ion-icon>
-                        <p>Friend request sent</p>
-                      </div>
-                    ) : isFriend ? (
-                      <div
-                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-white cursor-pointer"
-                        onClick={() => setIsFriend(false)}
-                      >
-                        <ion-icon name="person"></ion-icon>
-                        <p>Friends</p>
+                    {receivedFriendRequest ? (
+                      <div className="flex space-x-2">
+                        <div
+                          className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-white cursor-pointer"
+                          onClick={() => {
+                            handleChangeRequestStatus("accepted");
+                            setReceivedFriendRequest(false);
+                            setSentRequest(false);
+                            setIsFriend(true);
+                          }}
+                        >
+                          <p>Accept Request</p>
+                        </div>
+                        <div
+                          className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer"
+                          onClick={() => {
+                            handleChangeRequestStatus("rejected");
+                            setReceivedFriendRequest(false);
+                            setSentRequest(false);
+                            setIsFriend(false);
+                          }}
+                        >
+                          <p>Delete Request</p>
+                        </div>
                       </div>
                     ) : (
-                      <div
-                        className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold text-white cursor-pointer"
-                        onClick={() => setSentRequest(!sentRequest)}
-                      >
-                        <ion-icon name="person-add-outline"></ion-icon>
-                        <p>Add friend</p>
-                      </div>
+                      <>
+                        {sentRequest ? (
+                          <div
+                            className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer"
+                            onClick={handleRemoveFriendRequest}
+                          >
+                            <ion-icon name="person-add-outline"></ion-icon>
+                            <p>Friend request sent</p>
+                          </div>
+                        ) : isFriend ? (
+                          <>
+                            <div
+                              className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 bg-indigo-600 text-white cursor-pointer"
+                              onClick={() => {
+                                setIsModalOpen(true);
+                              }}
+                            >
+                              <ion-icon name="person"></ion-icon>
+                              <p>Friends</p>
+                            </div>
+                          </>
+                        ) : (
+                          <div
+                            className="flex h-full items-center justify-center px-3 py-1.5 space-x-2 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer"
+                            onClick={handleSendFriendRequest}
+                          >
+                            <ion-icon name="person-add-outline"></ion-icon>
+                            <p>Add friend</p>
+                          </div>
+                        )}
+                      </>
                     )}
                     {isFollowing ? (
                       <div

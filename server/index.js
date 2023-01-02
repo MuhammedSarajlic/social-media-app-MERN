@@ -11,6 +11,7 @@ import jwt from "jsonwebtoken";
 import Post from "./modules/PostModule.js";
 import Comment from "./modules/CommentModule.js";
 import User from "./modules/UserModule.js";
+import FriendRequest from "./modules/FriendRequestModule.js";
 
 const PORT = 5000;
 
@@ -228,6 +229,123 @@ app.delete("/api/posts/:id/comments", async (req, res) => {
     res.send({ message: "Comment deleted successfully" });
   } catch (error) {
     res.status(500).send(error);
+  }
+});
+
+app.post("/friend-request/send", async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+    const existingRequest = await FriendRequest.find({
+      senderId,
+      receiverId,
+      status: "pending",
+    });
+    if (existingRequest.length === 0) {
+      const existingRequest = await FriendRequest.findOne({
+        receiverId: senderId,
+        senderId: receiverId,
+        status: "pending",
+      });
+      if (existingRequest) {
+        return res.status(400).send({ error: "Friend request already exists" });
+      }
+    }
+    const friendRequest = new FriendRequest({
+      senderId,
+      receiverId,
+    });
+    await friendRequest.save();
+    res.send(friendRequest);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+//TODO: Create func for get friend request
+app.get("/friend-request/:id/check", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.query;
+    const friendRequest = await FriendRequest.findOne({
+      senderId: userId,
+      receiverId: id,
+      status: "pending",
+    });
+    if (!friendRequest) {
+      const friendRequest = await FriendRequest.findOne({
+        senderId: id,
+        receiverId: userId,
+        status: "pending",
+      });
+      return res.send(friendRequest);
+    }
+    res.send(friendRequest);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.delete("/friend-request/remove", async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+    await FriendRequest.findOneAndDelete({
+      senderId,
+      receiverId,
+      status: "pending",
+    });
+    res.send("request deleted");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.patch("/friend-request/status", async (req, res) => {
+  try {
+    const { senderId, receiverId, status } = req.body;
+    const request = await FriendRequest.findOne({
+      senderId,
+      receiverId,
+      status: "pending",
+    });
+    const requestId = request._id;
+    const result = await FriendRequest.updateOne(
+      { _id: requestId },
+      { $set: { status } }
+    );
+    if (status === "accepted") {
+      await User.findByIdAndUpdate(
+        senderId,
+        { $push: { friends: receiverId } },
+        { new: true }
+      );
+      await User.findByIdAndUpdate(
+        receiverId,
+        { $push: { friends: senderId } },
+        { new: true }
+      );
+      res.send({ status: "accepted" });
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.delete("/friend/remove", async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+    await User.findByIdAndUpdate(
+      senderId,
+      { $pull: { friends: receiverId } },
+      { new: true }
+    );
+    await User.findByIdAndUpdate(
+      receiverId,
+      { $pull: { friends: senderId } },
+      { new: true }
+    );
+    res.send("Removed friend");
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 });
 

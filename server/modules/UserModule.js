@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   imageUrl: String,
   followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   following: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 const User = mongoose.model("User", userSchema);

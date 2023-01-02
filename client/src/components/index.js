@@ -5,3 +5,4 @@ export { default as Post } from "./PostComponents/Post";
 export { default as LoadingPost } from "./PostComponents/LoadingPost";
 export { default as Comment } from "./CommentComponents/Comment";
 export { default as TempComment } from "./CommentComponents/TempComment";
+export { default as RemoveFriendModal } from "./UserComponents/RemoveFriendModal";
