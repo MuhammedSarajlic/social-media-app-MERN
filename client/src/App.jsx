@@ -2,6 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import { OpenedPost } from "./components";
 import { Home, Register, Login, UserProfile } from "./container/index";
 
 function App() {
@@ -79,6 +80,7 @@ function App() {
             path="/:username"
             element={<UserProfile user={user} handleLogOut={handleLogOut} />}
           />
+          <Route path="/post/:id" element={<OpenedPost user={user} />} />
         </Routes>
       </div>
     </>

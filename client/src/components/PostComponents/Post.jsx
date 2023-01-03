@@ -17,6 +17,7 @@ const Post = ({ post, user }) => {
   const time = moment(post.createdAt).format("HH:mm");
   const postId = post._id;
   const userId = user._id;
+  const receiver = post?.authorId._id;
 
   useEffect(() => {
     async function checkLiked() {
@@ -40,7 +41,7 @@ const Post = ({ post, user }) => {
   }, [postId]);
 
   const handleLike = async () => {
-    const id = post._id;
+    const id = post?._id;
     if (!isLiked) {
       await axios
         .post(`http://localhost:5000/api/posts/${id}/like`, { userId })
@@ -48,6 +49,18 @@ const Post = ({ post, user }) => {
           setLikeCount((prev) => prev + 1);
           setIsLiked(true);
         });
+      {
+        user._id !== receiver &&
+          (await axios
+            .post("http://localhost:5000/notifications/send", {
+              senderId: userId,
+              receiverId: receiver,
+              message: `liked your post`,
+              type: "like",
+              postId: id,
+            })
+            .then((res) => console.log(res)));
+      }
     } else if (isLiked) {
       await axios
         .delete(`http://localhost:5000/api/posts/${id}/like`, {
@@ -61,6 +74,7 @@ const Post = ({ post, user }) => {
   };
 
   const addComment = async (e) => {
+    const id = post?._id;
     e.preventDefault();
     await axios
       .post(`http://localhost:5000/api/posts/${postId}/comments`, {
@@ -73,6 +87,15 @@ const Post = ({ post, user }) => {
         setComment("");
       })
       .catch((error) => console.log(error));
+    await axios
+      .post("http://localhost:5000/notifications/send", {
+        senderId: userId,
+        receiverId: receiver,
+        message: `commented on your post`,
+        type: "comment",
+        postId: id,
+      })
+      .then((res) => console.log(res));
   };
 
   const handleShowComments = () => {

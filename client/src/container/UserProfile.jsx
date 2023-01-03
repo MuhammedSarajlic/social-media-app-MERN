@@ -48,14 +48,22 @@ const UserProfile = ({ user, handleLogOut }) => {
       });
   };
 
-  const handleFollow = () => {
-    axios
+  const handleFollow = async () => {
+    await axios
       .post(`http://localhost:5000/api/users/${id}/follow`, {
         userId,
       })
       .then(() => {
         setFollowersCount((prev) => prev + 1);
       });
+    await axios
+      .post("http://localhost:5000/notifications/send", {
+        senderId: userId,
+        receiverId: id,
+        message: `started following you`,
+        type: "follow",
+      })
+      .then((res) => console.log(res));
   };
 
   const handleUnfollow = () => {
@@ -66,8 +74,8 @@ const UserProfile = ({ user, handleLogOut }) => {
       .then(() => setFollowersCount((prev) => prev - 1));
   };
 
-  const handleSendFriendRequest = () => {
-    axios
+  const handleSendFriendRequest = async () => {
+    await axios
       .post("http://localhost:5000/friend-request/send", {
         senderId: userId,
         receiverId: id,
@@ -75,14 +83,29 @@ const UserProfile = ({ user, handleLogOut }) => {
       .then(() => {
         setSentRequest(true);
       });
+    await axios
+      .post("http://localhost:5000/notifications/send", {
+        senderId: userId,
+        receiverId: id,
+        message: `sent you a friend request`,
+        type: "friend request",
+      })
+      .then((res) => console.log(res));
   };
 
-  const handleRemoveFriendRequest = () => {
-    axios
+  const handleRemoveFriendRequest = async () => {
+    await axios
       .delete("http://localhost:5000/friend-request/remove", {
         data: { senderId: userId, receiverId: id },
       })
       .then(() => setSentRequest(false));
+    await axios.delete("http://localhost:5000/notifications/remove", {
+      data: {
+        senderId: userId,
+        receiverId: id,
+        type: "friend request",
+      },
+    });
   };
 
   const handleChangeRequestStatus = async (status) => {

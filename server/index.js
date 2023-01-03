@@ -12,6 +12,7 @@ import Post from "./modules/PostModule.js";
 import Comment from "./modules/CommentModule.js";
 import User from "./modules/UserModule.js";
 import FriendRequest from "./modules/FriendRequestModule.js";
+import Notification from "./modules/NotificationModule.js";
 
 const PORT = 5000;
 
@@ -119,6 +120,16 @@ app.get("/posts", async (req, res) => {
           path: "userId",
         },
       });
+    res.send(post);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.get("/posts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Post.findById(id).populate("authorId");
     res.send(post);
   } catch (error) {
     res.status(500).send(error.message);
@@ -344,6 +355,61 @@ app.delete("/friend/remove", async (req, res) => {
       { new: true }
     );
     res.send("Removed friend");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+//notifications
+app.get("/notifications/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notification = await Notification.find({ receiverId: id }).populate(
+      "senderId"
+    );
+    res.send(notification);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.delete("/notifications/remove", async (req, res) => {
+  try {
+    const { senderId, receiverId, type, postId } = req.body;
+    const notification = await Notification.findOneAndDelete({
+      senderId,
+      receiverId,
+      type,
+    });
+    const notificationId = notification._id;
+    await User.findByIdAndUpdate(
+      receiverId,
+      { $pull: { notifications: notificationId } },
+      { new: true }
+    );
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.post("/notifications/send", async (req, res) => {
+  try {
+    const { senderId, receiverId, message, type, postId } = req.body;
+    const notification = new Notification({
+      senderId,
+      receiverId,
+      type,
+      message,
+      postId,
+    });
+    await notification.save();
+    const notificationId = notification._id;
+    await User.findByIdAndUpdate(
+      receiverId,
+      { $push: { notifications: notificationId } },
+      { new: true }
+    );
+    res.send(notification);
   } catch (error) {
     res.status(500).send(error.message);
   }
