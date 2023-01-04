@@ -17,8 +17,9 @@ import Notification from "./modules/NotificationModule.js";
 import postRoutes from "./routes/Post.js";
 import followRoutes from "./routes/Follow.js";
 import userRoutes from "./routes/User.js";
-import likeRouter from "./routes/Like.js";
-import commentRouter from "./routes/Comment.js";
+import likeRoutes from "./routes/Like.js";
+import commentRoutes from "./routes/Comment.js";
+import friendRequestRoutes from "./routes/FriendRequest.js";
 
 const PORT = 5000;
 
@@ -30,8 +31,9 @@ app.use(cors());
 app.use("/api", postRoutes);
 app.use("/api/users", followRoutes);
 app.use("/api", userRoutes);
-app.use("/api/posts", likeRouter);
-app.use("/api/posts", commentRouter);
+app.use("/api/posts", likeRoutes);
+app.use("/api/posts", commentRoutes);
+app.use("/api/friend-request", friendRequestRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello");
@@ -39,80 +41,6 @@ app.get("/", (req, res) => {
 
 app.post("/register", registerStrategy);
 app.post("/login", loginStrategy);
-
-/********** friend request routes *************/
-
-app.post("/api/friend-request/send", async (req, res) => {
-  try {
-    const { senderId, receiverId } = req.body;
-    const existingRequest = await FriendRequest.findOne({
-      $or: [
-        { senderId, receiverId, status: "pending" },
-        { senderId: receiverId, receiverId: senderId, status: "pending" },
-      ],
-    });
-    if (existingRequest) {
-      return res.status(400).send({ error: "Friend request already exists" });
-    }
-    const friendRequest = new FriendRequest({
-      senderId,
-      receiverId,
-    });
-    await friendRequest.save();
-    res.send(friendRequest);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-app.get("/api/friend-request/:id/check", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req.query;
-    const friendRequest = await FriendRequest.findOne({
-      $or: [
-        { senderId: userId, receiverId: id, status: "pending" },
-        { senderId: id, receiverId: userId, status: "pending" },
-      ],
-    });
-    res.send(friendRequest || null);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-app.delete("/api/friend-request/remove", async (req, res) => {
-  const { senderId, receiverId } = req.body;
-  await FriendRequest.deleteOne({ senderId, receiverId, status: "pending" });
-  res.send("request deleted");
-});
-
-app.patch("/api/friend-request/status", async (req, res) => {
-  try {
-    const { senderId, receiverId, status } = req.body;
-    const request = await FriendRequest.findOneAndUpdate(
-      { senderId, receiverId, status: "pending" },
-      { $set: { status } },
-      { new: true }
-    );
-    if (!request) {
-      return res.status(404).send({ error: "Friend request not found" });
-    }
-    if (status === "accepted") {
-      await User.updateOne(
-        { _id: senderId },
-        { $push: { friends: receiverId } }
-      );
-      await User.updateOne(
-        { _id: receiverId },
-        { $push: { friends: senderId } }
-      );
-      res.send({ status: "accepted" });
-    }
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
 
 /********** friend routes *************/
 
