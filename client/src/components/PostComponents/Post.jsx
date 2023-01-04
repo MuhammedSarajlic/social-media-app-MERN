@@ -22,17 +22,19 @@ const Post = ({ post, user }) => {
   useEffect(() => {
     async function checkLiked() {
       await axios
-        .get(`http://localhost:5000/api/posts/${postId}/like?userId=${userId}`)
+        .get(
+          `http://localhost:5000/api/posts/${postId}/check-like?userId=${userId}`
+        )
         .then((res) => {
-          setIsLiked(res.data.liked);
+          setIsLiked(res.data);
         });
     }
     checkLiked();
     async function getComments() {
       await axios
-        .get(`http://localhost:5000/api/posts/${post._id}/comments`)
+        .get(`http://localhost:5000/api/posts/${post._id}/get-comments`)
         .then((res) => {
-          setComments(res.data.comments);
+          setComments(res.data);
         });
     }
     getComments();
@@ -44,7 +46,7 @@ const Post = ({ post, user }) => {
     const id = post?._id;
     if (!isLiked) {
       await axios
-        .post(`http://localhost:5000/api/posts/${id}/like`, { userId })
+        .post(`http://localhost:5000/api/posts/${id}/add-like`, { userId })
         .then(() => {
           setLikeCount((prev) => prev + 1);
           setIsLiked(true);
@@ -52,7 +54,7 @@ const Post = ({ post, user }) => {
       {
         user._id !== receiver &&
           (await axios
-            .post("http://localhost:5000/notifications/send", {
+            .post("http://localhost:5000/api/notifications/send", {
               senderId: userId,
               receiverId: receiver,
               message: `liked your post`,
@@ -63,7 +65,7 @@ const Post = ({ post, user }) => {
       }
     } else if (isLiked) {
       await axios
-        .delete(`http://localhost:5000/api/posts/${id}/like`, {
+        .delete(`http://localhost:5000/api/posts/${id}/remove-like`, {
           data: { userId },
         })
         .then(() => {
@@ -77,7 +79,7 @@ const Post = ({ post, user }) => {
     const id = post?._id;
     e.preventDefault();
     await axios
-      .post(`http://localhost:5000/api/posts/${postId}/comments`, {
+      .post(`http://localhost:5000/api/posts/${postId}/add-comment`, {
         userId,
         comment,
       })
@@ -87,15 +89,18 @@ const Post = ({ post, user }) => {
         setComment("");
       })
       .catch((error) => console.log(error));
-    await axios
-      .post("http://localhost:5000/notifications/send", {
-        senderId: userId,
-        receiverId: receiver,
-        message: `commented on your post`,
-        type: "comment",
-        postId: id,
-      })
-      .then((res) => console.log(res));
+    {
+      user._id !== receiver &&
+        (await axios
+          .post("http://localhost:5000/api/notifications/send", {
+            senderId: userId,
+            receiverId: receiver,
+            message: `commented on your post`,
+            type: "comment",
+            postId: id,
+          })
+          .then((res) => console.log(res)));
+    }
   };
 
   const handleShowComments = () => {

@@ -22,23 +22,23 @@ const OpenedPost = ({ user }) => {
 
   const getPost = async () => {
     await axios
-      .get(`http://localhost:5000/posts/${id}`)
+      .get(`http://localhost:5000/api/posts/${id}/get`)
       .then((res) => setPost(res.data));
   };
 
   const checkLiked = async () => {
     await axios
-      .get(`http://localhost:5000/api/posts/${id}/like?userId=${userId}`)
+      .get(`http://localhost:5000/api/posts/${id}/check-like?userId=${userId}`)
       .then((res) => {
-        setIsLiked(res.data.liked);
+        setIsLiked(res.data);
       });
   };
 
   const getComments = async () => {
     await axios
-      .get(`http://localhost:5000/api/posts/${id}/comments`)
+      .get(`http://localhost:5000/api/posts/${id}/get-comments`)
       .then((res) => {
-        setComments(res.data.comments);
+        setComments(res.data);
       });
   };
 
@@ -57,7 +57,7 @@ const OpenedPost = ({ user }) => {
     const id = post?._id;
     if (!isLiked) {
       await axios
-        .post(`http://localhost:5000/api/posts/${id}/like`, { userId })
+        .post(`http://localhost:5000/api/posts/${id}/add-like`, { userId })
         .then(() => {
           setLikeCount((prev) => prev + 1);
           setIsLiked(true);
@@ -65,7 +65,7 @@ const OpenedPost = ({ user }) => {
       {
         user._id !== receiver &&
           (await axios
-            .post("http://localhost:5000/notifications/send", {
+            .post("http://localhost:5000/api/notifications/send", {
               senderId: userId,
               receiverId: receiver,
               message: `liked your post`,
@@ -76,7 +76,7 @@ const OpenedPost = ({ user }) => {
       }
     } else if (isLiked) {
       await axios
-        .delete(`http://localhost:5000/api/posts/${id}/like`, {
+        .delete(`http://localhost:5000/api/posts/${id}/remove-like`, {
           data: { userId },
         })
         .then(() => {
@@ -90,7 +90,7 @@ const OpenedPost = ({ user }) => {
     e.preventDefault();
     const id = post?._id;
     await axios
-      .post(`http://localhost:5000/api/posts/${id}/comments`, {
+      .post(`http://localhost:5000/api/posts/${id}/add-comment`, {
         userId,
         comment,
       })
@@ -100,15 +100,18 @@ const OpenedPost = ({ user }) => {
         setComment("");
       })
       .catch((error) => console.log(error));
-    await axios
-      .post("http://localhost:5000/notifications/send", {
-        senderId: userId,
-        receiverId: receiver,
-        message: `commented on your post`,
-        type: "comment",
-        postId: id,
-      })
-      .then((res) => console.log(res));
+    {
+      user._id !== receiver &&
+        (await axios
+          .post("http://localhost:5000/api/notifications/send", {
+            senderId: userId,
+            receiverId: receiver,
+            message: `commented on your post`,
+            type: "comment",
+            postId: id,
+          })
+          .then((res) => console.log(res)));
+    }
   };
 
   if (!post) return <div>Loading...</div>;

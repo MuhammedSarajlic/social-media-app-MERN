@@ -14,7 +14,7 @@ const TempComment = ({
 
   const handleDeleteComment = () => {
     axios
-      .delete(`http://localhost:5000/api/posts/${commentId}/comments`)
+      .delete(`http://localhost:5000/api/posts/${commentId}/remove-comment`)
       .then(() => {
         setPostComments(
           postComments.filter((comment) => comment._id !== commentId)

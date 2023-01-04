@@ -16,7 +16,7 @@ const Comment = ({
 
   const handleDeleteComment = () => {
     axios
-      .delete(`http://localhost:5000/api/posts/${commentId}/comments`)
+      .delete(`http://localhost:5000/api/posts/${commentId}/remove-comment`)
       .then(() => {
         setComments(comments.filter((comment) => comment._id !== commentId));
         setCommentCount((prev) => prev - 1);

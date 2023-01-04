@@ -26,7 +26,7 @@ const Home = ({ user, handleLogOut }) => {
   });
 
   useEffect(() => {
-    axios.get("http://localhost:5000/posts").then((response) => {
+    axios.get("http://localhost:5000/api/get-posts").then((response) => {
       setPosts(response.data);
     });
   }, []);
@@ -47,7 +47,7 @@ const Home = ({ user, handleLogOut }) => {
     setIsLoading(true);
     const { description, imageUrl } = formData;
     axios
-      .post("http://localhost:5000/create-post", {
+      .post("http://localhost:5000/api/create-post", {
         description,
         imageUrl,
         authorId: user._id,

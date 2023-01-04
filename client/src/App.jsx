@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { OpenedPost } from "./components";
+import { Navbar, OpenedPost } from "./components";
 import { Home, Register, Login, UserProfile } from "./container/index";
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
 
   const getUser = async () => {
     await axios
-      .get(`http://localhost:5000/user?email=${currentUserEmail}`)
+      .get(`http://localhost:5000/api/get-user?prop=${currentUserEmail}`)
       .then((res) => {
         setUser(res.data);
       })
