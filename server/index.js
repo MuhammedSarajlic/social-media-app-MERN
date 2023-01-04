@@ -16,6 +16,7 @@ import Notification from "./modules/NotificationModule.js";
 
 import postRoutes from "./routes/Post.js";
 import followRoutes from "./routes/Follow.js";
+import userRoutes from "./routes/User.js";
 
 const PORT = 5000;
 
@@ -26,6 +27,7 @@ app.use(cors());
 
 app.use("/api", postRoutes);
 app.use("/api/users", followRoutes);
+app.use("/api", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello");
@@ -34,20 +36,6 @@ app.get("/", (req, res) => {
 app.post("/register", registerStrategy);
 
 app.post("/login", loginStrategy);
-
-/********** user routes *************/
-
-app.get("/api/get-user", async (req, res) => {
-  try {
-    const { prop } = req.query;
-    const user = await User.findOne({
-      $or: [{ username: prop }, { email: prop }],
-    });
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
 
 /********** like routes *************/
 
