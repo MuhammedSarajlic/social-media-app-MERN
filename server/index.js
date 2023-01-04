@@ -18,6 +18,7 @@ import postRoutes from "./routes/Post.js";
 import followRoutes from "./routes/Follow.js";
 import userRoutes from "./routes/User.js";
 import likeRouter from "./routes/Like.js";
+import commentRouter from "./routes/Comment.js";
 
 const PORT = 5000;
 
@@ -30,6 +31,7 @@ app.use("/api", postRoutes);
 app.use("/api/users", followRoutes);
 app.use("/api", userRoutes);
 app.use("/api/posts", likeRouter);
+app.use("/api/posts", commentRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello");
@@ -37,60 +39,6 @@ app.get("/", (req, res) => {
 
 app.post("/register", registerStrategy);
 app.post("/login", loginStrategy);
-
-/********** comment routes *************/
-
-app.get("/api/posts/:id/get-comments", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const post = await Post.findById(id).populate({
-      path: "comments",
-      options: {
-        sort: { createdAt: -1 },
-      },
-      populate: {
-        path: "userId",
-      },
-    });
-    res.send(post.comments);
-  } catch (error) {
-    res.status(500).send({ error: "Error fetching comments" });
-  }
-});
-
-app.post("/api/posts/:id/add-comment", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId, comment } = req.body;
-    const newComment = await Comment.create({ userId, comment });
-    await Post.findByIdAndUpdate(
-      id,
-      { $push: { comments: newComment._id } },
-      { new: true }
-    );
-    res.send(newComment);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-app.delete("/api/posts/:id/remove-comment", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const post = await Post.findOneAndUpdate(
-      { comments: id },
-      { $pull: { comments: id } },
-      { new: true }
-    );
-    if (!post) {
-      return res.status(404).send({ error: "Comment not found" });
-    }
-    await Comment.findByIdAndDelete(id);
-    res.send({ message: "Comment deleted successfully" });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
 
 /********** friend request routes *************/
 
