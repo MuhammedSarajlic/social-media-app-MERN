@@ -17,6 +17,7 @@ import Notification from "./modules/NotificationModule.js";
 import postRoutes from "./routes/Post.js";
 import followRoutes from "./routes/Follow.js";
 import userRoutes from "./routes/User.js";
+import likeRouter from "./routes/Like.js";
 
 const PORT = 5000;
 
@@ -28,69 +29,14 @@ app.use(cors());
 app.use("/api", postRoutes);
 app.use("/api/users", followRoutes);
 app.use("/api", userRoutes);
+app.use("/api/posts", likeRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello");
 });
 
 app.post("/register", registerStrategy);
-
 app.post("/login", loginStrategy);
-
-/********** like routes *************/
-
-app.post("/api/posts/:id/add-like", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req.body;
-    const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).send({ error: "Post not found" });
-    }
-    if (post.likes.includes(userId)) {
-      return res.status(400).send({ error: "Post already liked" });
-    }
-    post.likes.push(userId);
-    await post.save();
-    res.send({ message: "Post liked" });
-  } catch (error) {
-    res.status(500).send({ error: "Error liking post" });
-  }
-});
-
-app.delete("/api/posts/:id/remove-like", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req.body;
-    const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).send({ error: "Post not found" });
-    }
-    const index = post.likes.indexOf(userId);
-    if (index === -1) {
-      return res.status(400).send({ error: "Post not liked" });
-    }
-    post.likes.splice(index, 1);
-    await post.save();
-    res.send({ message: "Post unliked" });
-  } catch (error) {
-    res.status(500).send({ error: "Error unliking post" });
-  }
-});
-
-app.get("/api/posts/:id/check-like", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req.query;
-    const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).send("Post not found!");
-    }
-    res.send(post.likes.includes(userId));
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
 
 /********** comment routes *************/
 
