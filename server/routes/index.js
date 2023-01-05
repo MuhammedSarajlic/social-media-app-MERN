@@ -1,2 +1,10 @@
 export { default as loginStrategy } from "./LoginStrategy.js";
 export { default as registerStrategy } from "./RegisterStrategy.js";
+export { default as postRoutes } from "./Post.js";
+export { default as followRoutes } from "./Follow.js";
+export { default as userRoutes } from "./User.js";
+export { default as likeRoutes } from "./Like.js";
+export { default as commentRoutes } from "./Comment.js";
+export { default as friendRequestRoutes } from "./FriendRequest.js";
+export { default as friendRoutes } from "./Friend.js";
+export { default as notificationRoutes } from "./Notification.js";

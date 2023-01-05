@@ -38,11 +38,13 @@ export async function checkRequest(req, res) {
     res.status(500).send(error.message);
   }
 }
+
 export async function removeRequest(req, res) {
   const { senderId, receiverId } = req.body;
   await FriendRequest.deleteOne({ senderId, receiverId, status: "pending" });
   res.send("request deleted");
 }
+
 export async function statusOfRequest(req, res) {
   try {
     const { senderId, receiverId, status } = req.body;
@@ -64,6 +66,8 @@ export async function statusOfRequest(req, res) {
         { $push: { friends: senderId } }
       );
       res.send({ status: "accepted" });
+    } else if (status === "rejected") {
+      res.send({ status: "rejected" });
     }
   } catch (error) {
     res.status(500).send(error.message);

@@ -99,12 +99,7 @@ const UserProfile = ({ user, handleLogOut }) => {
       .then((res) => console.log(res));
   };
 
-  const handleRemoveFriendRequest = async () => {
-    await axios
-      .delete("http://localhost:5000/api/friend-request/remove", {
-        data: { senderId: userId, receiverId: id },
-      })
-      .then(() => setSentRequest(false));
+  const deleteNotification = async () => {
     await axios.delete("http://localhost:5000/api/notifications/remove", {
       data: {
         senderId: userId,
@@ -112,6 +107,15 @@ const UserProfile = ({ user, handleLogOut }) => {
         type: "friend request",
       },
     });
+  };
+
+  const handleRemoveFriendRequest = async () => {
+    await axios
+      .delete("http://localhost:5000/api/friend-request/remove", {
+        data: { senderId: userId, receiverId: id },
+      })
+      .then(() => setSentRequest(false));
+    deleteNotification();
   };
 
   const handleChangeRequestStatus = async (status) => {
@@ -122,7 +126,11 @@ const UserProfile = ({ user, handleLogOut }) => {
         status,
       })
       .then((res) => {
-        res.data.status === "accepted" && setFriendsCount((prev) => prev + 1);
+        if (res.data.status === "accepted") {
+          setFriendsCount((prev) => prev + 1);
+        } else if (res.data.status === "rejected") {
+          deleteNotification();
+        }
       });
   };
 
