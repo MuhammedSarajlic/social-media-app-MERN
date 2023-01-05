@@ -20,6 +20,7 @@ import userRoutes from "./routes/User.js";
 import likeRoutes from "./routes/Like.js";
 import commentRoutes from "./routes/Comment.js";
 import friendRequestRoutes from "./routes/FriendRequest.js";
+import friendRoutes from "./routes/Friend.js";
 
 const PORT = 5000;
 
@@ -34,6 +35,7 @@ app.use("/api", userRoutes);
 app.use("/api/posts", likeRoutes);
 app.use("/api/posts", commentRoutes);
 app.use("/api/friend-request", friendRequestRoutes);
+app.use("/api/friend", friendRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello");
@@ -41,21 +43,6 @@ app.get("/", (req, res) => {
 
 app.post("/register", registerStrategy);
 app.post("/login", loginStrategy);
-
-/********** friend routes *************/
-
-app.delete("/api/friend/remove", async (req, res) => {
-  try {
-    const { senderId, receiverId } = req.body;
-    await User.updateMany(
-      { _id: { $in: [senderId, receiverId] } },
-      { $pull: { friends: { $in: [senderId, receiverId] } } }
-    );
-    res.send("Removed friend");
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
 
 /********** notifications routes *************/
 
