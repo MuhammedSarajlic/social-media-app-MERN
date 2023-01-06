@@ -200,8 +200,6 @@ const OpenedPost = ({ user }) => {
               {comments.map((comment) => (
                 <Comment
                   key={comment._id}
-                  user={user}
-                  post={post}
                   comment={comment}
                   comments={comments}
                   setComments={setComments}

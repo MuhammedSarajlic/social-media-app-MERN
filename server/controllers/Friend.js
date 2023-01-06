@@ -12,3 +12,13 @@ export async function removeFriend(req, res) {
     res.status(500).send(error.message);
   }
 }
+
+export async function getFriends(req, res) {
+  try {
+    const { id } = req.params;
+    const friends = User.findById(id).populate("friends");
+    res.send(friends);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}

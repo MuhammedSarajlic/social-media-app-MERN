@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   AddPostForm,
   AddPostModal,
+  Friend,
   LoadingPost,
   Navbar,
   Post,
@@ -24,6 +25,7 @@ const Home = ({ user, handleLogOut }) => {
     imageUrl: "",
     authorId: "",
   });
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     axios.get("http://localhost:5000/api/get-posts").then((response) => {
@@ -59,6 +61,12 @@ const Home = ({ user, handleLogOut }) => {
       });
     handleRemoveImage();
     setIsOpen({ addPostModal: false });
+  };
+
+  const getFriends = async () => {
+    await axios
+      .get("http://localhost:5000/api/friend/${user._id}/get")
+      .then((res) => setFriends(res.data));
   };
 
   const handleOpen = () => {
@@ -120,7 +128,12 @@ const Home = ({ user, handleLogOut }) => {
             )}
           </div>
         </div>
-        <div className="w-1/3 bg-lime-600">Suggest</div>
+        <div className="w-1/3 h-full bg-white py-4 rounded-lg space-y-3 px-1">
+          <p className="font-bold text-lg px-4">Friends</p>
+          {user.friends.map((friend) => (
+            <Friend key={friend._id} friend={friend} />
+          ))}
+        </div>
       </div>
     </>
   );

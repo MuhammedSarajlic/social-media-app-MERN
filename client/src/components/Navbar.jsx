@@ -15,7 +15,6 @@ const Navbar = ({ user, handleLogOut }) => {
     await axios
       .get(`http://localhost:5000/api/notifications/${user?._id}/get`)
       .then((res) => {
-        console.log(res.data);
         setNotifications(res.data);
       });
   };

@@ -3,7 +3,13 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { LoadingPost, Navbar, Post, RemoveFriendModal } from "../components";
+import {
+  Friend,
+  LoadingPost,
+  Navbar,
+  Post,
+  RemoveFriendModal,
+} from "../components";
 
 const UserProfile = ({ user, handleLogOut }) => {
   const { username } = useParams();
@@ -20,6 +26,12 @@ const UserProfile = ({ user, handleLogOut }) => {
   const userId = user?._id;
   const id = openedUser?._id;
 
+  const checkFriend = () => {
+    openedUser?.friends.forEach((item) => {
+      setIsFriend(item._id === userId);
+    });
+  };
+
   useEffect(() => {
     axios
       .get(`http://localhost:5000/api/get-user?prop=${username}`)
@@ -29,7 +41,7 @@ const UserProfile = ({ user, handleLogOut }) => {
         setFollowingCount(res.data.following.length);
         setFriendsCount(res.data.friends.length);
         setIsFollowing(res.data.followers.includes(user?._id));
-        setIsFriend(res.data.friends.includes(userId));
+        // (user || userId !== id) &&
       });
     axios
       .get("http://localhost:5000/api/get-posts")
@@ -38,17 +50,17 @@ const UserProfile = ({ user, handleLogOut }) => {
 
   useEffect(() => {
     userId && id && getFriend();
+    checkFriend();
   }, [openedUser, receivedFriendRequest]);
 
-  const getFriend = () => {
-    axios
+  const getFriend = async () => {
+    await axios
       .get(
         `http://localhost:5000/api/friend-request/${id}/check?userId=${userId}`
       )
       .then((res) => {
         if (res.data.status !== null) {
           res.data.status === "pending" && setSentRequest(true);
-          res.data.status === "accepted" && setIsFriend(true);
           setReceivedFriendRequest(res.data.receiverId === userId);
         }
       });
@@ -72,8 +84,8 @@ const UserProfile = ({ user, handleLogOut }) => {
       .then((res) => console.log(res));
   };
 
-  const handleUnfollow = () => {
-    axios
+  const handleUnfollow = async () => {
+    await axios
       .post(`http://localhost:5000/api/users/${id}/unfollow`, {
         userId,
       })
@@ -304,7 +316,12 @@ const UserProfile = ({ user, handleLogOut }) => {
               <LoadingPost />
             )}
           </div>
-          <div className="w-1/3 h-48 bg-gray-400"></div>
+          <div className="w-1/3 h-full bg-white py-4 rounded-lg space-y-3 px-1">
+            <p className="font-bold text-lg px-4">Friends</p>
+            {user.friends.map((friend) => (
+              <Friend key={friend._id} friend={friend} />
+            ))}
+          </div>
         </div>
       </div>
     </>

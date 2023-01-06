@@ -26,7 +26,6 @@ const TempComment = ({
 
   return (
     <>
-      {console.log(isOpen)}
       <div className="flex items-start my-2 space-x-1">
         <div className="w-10">
           <img src={user?.imageUrl} className="w-8 h-8 rounded-full" />

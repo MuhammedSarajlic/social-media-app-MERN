@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { Navbar, OpenedPost } from "./components";
+import { OpenedPost } from "./components";
 import { Home, Register, Login, UserProfile } from "./container/index";
 
 function App() {

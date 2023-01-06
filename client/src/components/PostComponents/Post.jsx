@@ -13,6 +13,7 @@ const Post = ({ post, user }) => {
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isComment, setIsComment] = useState(false);
+
   const date = moment(post.createdAt).format("MMMM D, YYYY");
   const time = moment(post.createdAt).format("HH:mm");
   const postId = post._id;
@@ -89,18 +90,16 @@ const Post = ({ post, user }) => {
         setComment("");
       })
       .catch((error) => console.log(error));
-    {
-      user._id !== receiver &&
-        (await axios
-          .post("http://localhost:5000/api/notifications/send", {
-            senderId: userId,
-            receiverId: receiver,
-            message: `commented on your post`,
-            type: "comment",
-            postId: id,
-          })
-          .then((res) => console.log(res)));
-    }
+    user._id !== receiver &&
+      (await axios
+        .post("http://localhost:5000/api/notifications/send", {
+          senderId: userId,
+          receiverId: receiver,
+          message: `commented on your post`,
+          type: "comment",
+          postId: id,
+        })
+        .then((res) => console.log(res)));
   };
 
   const handleShowComments = () => {
@@ -196,8 +195,6 @@ const Post = ({ post, user }) => {
                 comments.map((comment) => (
                   <Comment
                     key={comment._id}
-                    user={user}
-                    post={post}
                     comment={comment}
                     comments={comments}
                     setComments={setComments}

@@ -7,3 +7,4 @@ export { default as LoadingPost } from "./PostComponents/LoadingPost";
 export { default as Comment } from "./CommentComponents/Comment";
 export { default as TempComment } from "./CommentComponents/TempComment";
 export { default as RemoveFriendModal } from "./UserComponents/RemoveFriendModal";
+export { default as Friend } from "./UserComponents/Friend";
